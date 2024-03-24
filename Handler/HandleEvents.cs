@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.Net;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using System;
 using System.Data;
 using MessageType = Janitor.Model.MessageType;
 
@@ -26,6 +27,7 @@ namespace Janitor.Handler
             "World's okayest Janitor",
             "↑ This is what a really cool janitor looks like"
         };
+
         public HandleEvents(DiscordSocketClient client)
         {
             //Register new Events
@@ -41,6 +43,7 @@ namespace Janitor.Handler
         {
             //If Client is ready Create Management role if it does not exist
             await GetOrCreateRole(arg, "Role Manager");
+            AddUserCommand(arg);
         }
 
         private async Task Client_UserCommandExecuted(SocketUserCommand arg)
@@ -50,7 +53,9 @@ namespace Janitor.Handler
             var guild = _client.GetGuild((ulong)arg.GuildId);
 
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").ToList()[0];
-            var roleJanitor1 = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsHoisted && x.Members.Where(x => x.Id == _client.CurrentUser.Id).Count() == 0).ToList();
+            var roleJanitor1 = guild.Roles.Where(x => x.Name == "Janitor").ToList();
+            roleJanitor1 = roleJanitor1.Where(x => !x.IsManaged).ToList();
+            roleJanitor1 = roleJanitor1.Where(x => x.Members.Where(x => x.Id == _client.CurrentUser.Id).Count() == 0).ToList();
             var roleJanitor = roleJanitor1.ToList()[0];
 
             if (user.Roles.Contains(roleManager))
@@ -122,7 +127,6 @@ namespace Janitor.Handler
             if (type == MessageType.UserHasRoleNow)
                 await msg.Channel.SendMessageAsync($"\"{FriendRole}\" role has been granted to {target.Mention} by {user.Mention}.");
         }
-
 
         private async Task Client_Ready()
         {
