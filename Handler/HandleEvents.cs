@@ -100,7 +100,7 @@ namespace Janitor.Handler
                     col = Color.Red;
                     break;
                 case MessageType.UserHasRoleNow:
-                    text = $"({target.DisplayName}) has now the Role \"{FriendRole}\"!";
+                    text = $"({target.DisplayName}) now has the Role \"{FriendRole}\"!";
                     col = Color.Green;
                     break;
                 case MessageType.JanitorCantHaveRole:
@@ -112,7 +112,7 @@ namespace Janitor.Handler
                     col = Color.Blue;
                     break;
                 case MessageType.CantAddRoleToYourself:
-                    text = $"You are not supposed to do that... Nice Try tho. :melting_face:";
+                    text = $"You seem to have emotional problems. Try to join voice, they might help you. :melting_face:";
                     col = Color.Blue;
                     break;
             }
