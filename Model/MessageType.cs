@@ -6,7 +6,7 @@
         BotCantHaveRole,
         UserHasRoleNow,
         JanitorCantHaveRole,
-        UserHasRoleAllready,
+        UserHasRoleAlready,
         CantAddRoleToYourself,
     }
 }

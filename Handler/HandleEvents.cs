@@ -20,12 +20,13 @@ namespace Janitor.Handler
         {
             "I'm a Janitor. \r\nWhat is your superpower?",
             "I never asked to be the world's best Janitor, but here I am absolutely killing it.",
-            "Never trust a janitor with tattoos",
+            "Never trust a Janitor with tattoos",
             "Powered by Coffee",
-            "No one pays attention to the janitor.",
-            "Everything will be fine, the janitor is here.",
+            "No one pays attention to the Janitor.",
+            "Everything will be fine, the Janitor is here.",
             "World's okayest Janitor",
-            "↑ This is what a really cool janitor looks like"
+            "↑ This is what a really cool Janitor looks like",
+            "What?" // Insider. ;)
         };
 
         public HandleEvents(DiscordSocketClient client)
@@ -67,7 +68,7 @@ namespace Janitor.Handler
                 }
                 else if (target.Roles.Where(x => x.Name == FriendRole).Count() == 1)
                 {
-                    await SendInfo(arg, MessageType.UserHasRoleAllready, target);
+                    await SendInfo(arg, MessageType.UserHasRoleAlready, target);
                     return;
                 }
                 else if (target.IsBot)
@@ -100,14 +101,14 @@ namespace Janitor.Handler
                     col = Color.Red;
                     break;
                 case MessageType.UserHasRoleNow:
-                    text = $"({target.DisplayName}) now has the Role \"{FriendRole}\"!";
+                    text = $"({target.DisplayName}) has been granted the Role \"{FriendRole}\"!";
                     col = Color.Green;
                     break;
                 case MessageType.JanitorCantHaveRole:
-                    text = $"A Janitor can't have the Role \"{FriendRole}\"!";
+                    text = $"A Janitor can't have the Role \"{FriendRole}\"! They're cool enough already!";
                     col = Color.Red;
                     break;
-                case MessageType.UserHasRoleAllready:
+                case MessageType.UserHasRoleAlready:
                     text = $"({target.DisplayName}) already got the Role \"{FriendRole}\"!";
                     col = Color.Blue;
                     break;
