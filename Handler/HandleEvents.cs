@@ -50,7 +50,8 @@ namespace Janitor.Handler
             var guild = _client.GetGuild((ulong)arg.GuildId);
 
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").ToList()[0];
-            var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor").ToList()[0];
+            var roleJanitor1 = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsHoisted && x.Members.Where(x => x.Id == _client.CurrentUser.Id).Count() == 0).ToList();
+            var roleJanitor = roleJanitor1.ToList()[0];
 
             if (user.Roles.Contains(roleManager))
             {
