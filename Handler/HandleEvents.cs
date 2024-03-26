@@ -57,7 +57,7 @@ namespace Janitor.Handler
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
 
-            Console.WriteLine($"{DateTime.Now.ToString("hh:mm:ss")} {user.DisplayName} invoked Janitor for {target.DisplayName}");
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {user.DisplayName} invoked Janitor for {target.DisplayName}");
 
             if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
             {
