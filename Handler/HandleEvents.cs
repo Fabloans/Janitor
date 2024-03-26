@@ -57,26 +57,35 @@ namespace Janitor.Handler
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
 
+            Console.WriteLine($"{DateTime.Now.ToString("hh:mm:ss")} {user.DisplayName} invoked Janitor for {target.DisplayName}");
+
             if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
             {
                 if (user == target)
                 {
                     await SendInfo(arg, MessageType.CantAddRoleToYourself);
-                    return;
+                    Console.WriteLine($"-> Fail: AddRoleToYourself");
                 }
                 else if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
                 {
                     await SendInfo(arg, MessageType.UserHasRoleAlready, target);
-                    return;
+                    Console.WriteLine($"-> Fail: UserHasRoleAlready");
                 }
                 else if (target.IsBot)
+                {
                     await SendInfo(arg, MessageType.BotCantHaveRole);
+                    Console.WriteLine($"-> Fail: BotCantHaveRole");
+                }
                 else if (target.Roles.Contains(roleJanitor))
+                {
                     await SendInfo(arg, MessageType.JanitorCantHaveRole);
+                    Console.WriteLine($"-> Fail: JanitorCantHaveRole");
+                }
                 else
                 {
                     await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
                     await SendInfo(arg, MessageType.UserHasRoleNow, target, user);
+                    Console.WriteLine($"-> Success: {target.DisplayName} has been assign the \"{roleFriend}\" Role");
                 }
             }
             else
