@@ -18,15 +18,16 @@ namespace Janitor.Handler
         //A simple list of some Janitor related sayings
         List<string> status = new List<string>()
         {
-            "I'm a Janitor. \r\nWhat is your superpower?",
+            "I'm a Janitor. What is your superpower?",
             "I never asked to be the world's best Janitor, but here I am absolutely killing it.",
-            "Never trust a Janitor with tattoos",
-            "Powered by Coffee",
+            "Never trust a Janitor with tattoos!",
+            "Powered by Coffee.",
             "No one pays attention to the Janitor.",
             "Everything will be fine, the Janitor is here.",
-            "World's okayest Janitor",
-            "↑ This is what a really cool Janitor looks like",
-            "What?" // Insider. ;)
+            "World's okayest Janitor.",
+            "↑ This is what a really cool Janitor looks like.",
+            "What?", // Insider. ;)
+            "Why are you looking at me like that?"
         };
 
         public HandleEvents(DiscordSocketClient client)
@@ -54,11 +55,7 @@ namespace Janitor.Handler
             var guild = _client.GetGuild((ulong)arg.GuildId);
 
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
-            var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First(); // Easier and does the same as below?
-            //var roleJanitor1 = guild.Roles.Where(x => x.Name == "Janitor").ToList();
-            //roleJanitor1 = roleJanitor1.Where(x => !x.IsManaged).ToList();
-            //roleJanitor1 = roleJanitor1.Where(x => x.Members.Where(x => x.Id == _client.CurrentUser.Id).Count() == 0).ToList();
-            //var roleJanitor = roleJanitor1.ToList()[0];
+            var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
 
             if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
             {
@@ -114,7 +111,7 @@ namespace Janitor.Handler
                     col = Color.Blue;
                     break;
                 case MessageType.CantAddRoleToYourself:
-                    text = $"You seem to have emotional problems. Try to join voice, they might help you. :melting_face:";
+                    text = $"You seem to have emotional problems. Try to join voice, we might be able to help you. :melting_face:";
                     col = Color.Blue;
                     break;
             }
