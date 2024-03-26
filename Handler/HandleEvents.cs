@@ -27,7 +27,8 @@ namespace Janitor.Handler
             "World's okayest Janitor.",
             "↑ This is what a really cool Janitor looks like.",
             "What?", // Insider. ;)
-            "Why are you looking at me like that?"
+            "Why are you looking at me like that?",
+            "Sometimes I think I'm Batman."
         };
 
         public HandleEvents(DiscordSocketClient client)
@@ -89,7 +90,10 @@ namespace Janitor.Handler
                 }
             }
             else
+            {
                 await SendInfo(arg, MessageType.NotAllowed);
+                Console.WriteLine($"-> Fail: NotAllowed");
+            }
         }
 
         private async Task SendInfo(SocketUserCommand msg, MessageType type, SocketGuildUser target = null, SocketGuildUser user = null)
