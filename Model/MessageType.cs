@@ -2,11 +2,13 @@
 {
     public enum MessageType
     {
-        NotAllowed,
         BotCantHaveRole,
-        UserHasRoleNow,
-        JanitorCantHaveRole,
-        UserHasRoleAlready,
         CantAddRoleToYourself,
+        FriendRoleRemoved,
+        JanitorCantHaveRole,
+        UserDoesntHaveRole,
+        UserHasRoleAlready,
+        UserHasRoleNow,
+        NotAllowed,
     }
 }

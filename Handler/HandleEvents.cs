@@ -51,48 +51,76 @@ namespace Janitor.Handler
 
         private async Task Client_UserCommandExecuted(SocketUserCommand arg)
         {
+            var command = arg.CommandName;
             var target = arg.Data.Member as SocketGuildUser;
             var user = arg.User as SocketGuildUser;
             var guild = _client.GetGuild((ulong)arg.GuildId);
 
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
-                        
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked Janitor for {target.DisplayName}");
 
-            if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
+            if (command == $"Add {roleFriend} Role")
             {
-                if (user == target)
+                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"Add Friend Role\" for {target.DisplayName}");
+
+                if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
                 {
-                    await SendInfo(arg, MessageType.CantAddRoleToYourself);
-                    Console.WriteLine($"-> Fail: AddRoleToYourself");
-                }
-                else if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
-                {
-                    await SendInfo(arg, MessageType.UserHasRoleAlready, target);
-                    Console.WriteLine($"-> Fail: UserHasRoleAlready");
-                }
-                else if (target.IsBot)
-                {
-                    await SendInfo(arg, MessageType.BotCantHaveRole, target);
-                    Console.WriteLine($"-> Fail: BotCantHaveRole");
-                }
-                else if (target.Roles.Contains(roleJanitor))
-                {
-                    await SendInfo(arg, MessageType.JanitorCantHaveRole);
-                    Console.WriteLine($"-> Fail: JanitorCantHaveRole");
+                    if (user == target)
+                    {
+                        await SendInfo(arg, MessageType.CantAddRoleToYourself);
+                        Console.WriteLine($"-> Fail: CantAddRoleToYourself");
+                    }
+                    else if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
+                    {
+                        await SendInfo(arg, MessageType.UserHasRoleAlready, target);
+                        Console.WriteLine($"-> Fail: UserHasRoleAlready");
+                    }
+                    else if (target.IsBot)
+                    {
+                        await SendInfo(arg, MessageType.BotCantHaveRole, target);
+                        Console.WriteLine($"-> Fail: BotCantHaveRole");
+                    }
+                    else if (target.Roles.Contains(roleJanitor))
+                    {
+                        await SendInfo(arg, MessageType.JanitorCantHaveRole);
+                        Console.WriteLine($"-> Fail: JanitorCantHaveRole");
+                    }
+                    else
+                    {
+                        await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
+                        await SendInfo(arg, MessageType.UserHasRoleNow, target, user);
+                        Console.WriteLine($"-> Success: {target.DisplayName} has been assigned the \"{roleFriend}\" Role");
+                    }
                 }
                 else
                 {
-                    await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
-                    await SendInfo(arg, MessageType.UserHasRoleNow, target, user);
-                    Console.WriteLine($"-> Success: {target.DisplayName} has been assigned the \"{roleFriend}\" Role");
+                    await SendInfo(arg, MessageType.NotAllowed);
+                    Console.WriteLine($"-> Fail: NotAllowed");
                 }
             }
-            else
+            else if (command == $"Remove {roleFriend} Role")
             {
-                await SendInfo(arg, MessageType.NotAllowed);
-                Console.WriteLine($"-> Fail: NotAllowed");
+                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"Remove Friend Role\" for {target.DisplayName}");
+
+                if (user.Roles.Contains(roleManager))
+                {
+                    if (user == target)
+                    {
+                        await SendInfo(arg, MessageType.CantAddRoleToYourself);
+                        Console.WriteLine($"-> Fail: CantAddRoleToYourself");
+                    }
+                    else if (target.Roles.Where(x => x.Name == roleFriend).Count() != 1)
+                    {
+                        await SendInfo(arg, MessageType.UserDoesntHaveRole, target);
+                        Console.WriteLine($"-> Fail: UserDoesntHaveRole");
+                    }
+                    else
+                    {
+                        await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
+                        await SendInfo(arg, MessageType.FriendRoleRemoved, target, user);
+                        Console.WriteLine($"-> Success: \"{roleFriend}\" Role has been removed from {target.DisplayName}.");
+                    }
+                }
             }
         }
 
@@ -114,8 +142,16 @@ namespace Janitor.Handler
                         text = $"A bot can't have the Role \"{roleFriend}\"!";
                     col = Color.Red;
                     break;
+                case MessageType.UserDoesntHaveRole:
+                    text = $"({target.DisplayName}) doesn't have the Role \"{roleFriend}\"!";
+                    col = Color.Red;
+                    break;
                 case MessageType.UserHasRoleNow:
                     text = $"({target.DisplayName}) has been granted the Role \"{roleFriend}\"!";
+                    col = Color.Green;
+                    break;
+                case MessageType.FriendRoleRemoved:
+                    text = $"Removed the Role \"{roleFriend}\" from ({target.DisplayName})!";
                     col = Color.Green;
                     break;
                 case MessageType.JanitorCantHaveRole:
@@ -141,6 +177,8 @@ namespace Janitor.Handler
 
             if (type == MessageType.UserHasRoleNow)
                 await msg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.");
+            if (type == MessageType.FriendRoleRemoved)
+                await msg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.");
         }
 
         private async Task Client_Ready()
@@ -174,15 +212,18 @@ namespace Janitor.Handler
 
         private async void AddUserCommand(SocketGuild guild)
         {
-            var guildUserCommand = new UserCommandBuilder();
+            var guildUserCommandAddRole = new UserCommandBuilder();
+            var guildUserCommandRemoveRole = new UserCommandBuilder();
 
-            guildUserCommand.WithName($"Add {roleFriend} Role");
+            guildUserCommandAddRole.WithName($"Add {roleFriend} Role");
+            guildUserCommandRemoveRole.WithName($"Remove {roleFriend} Role");
 
             try
             {
                 await guild.BulkOverwriteApplicationCommandAsync(new ApplicationCommandProperties[]
                 {
-                    guildUserCommand.Build(),
+                    guildUserCommandAddRole.Build(),
+                    guildUserCommandRemoveRole.Build(),
                 });
 
             }
