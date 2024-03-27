@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Data;
+using static System.Net.Mime.MediaTypeNames;
 using MessageType = Janitor.Model.MessageType;
 
 namespace Janitor.Handler
@@ -40,8 +41,29 @@ namespace Janitor.Handler
 
             client.JoinedGuild += Client_JoinedGuild;
             client.UserCommandExecuted += Client_UserCommandExecuted;
+            client.ButtonExecuted += Client_ButtonExecuted;
 
             _client = client;
+        }
+
+        private async Task Client_ButtonExecuted(SocketMessageComponent arg)
+        {
+            if (arg.Data.CustomId.StartsWith("remove_"))
+            {
+                //TODO
+                //var val = arg.Data.CustomId.Split('_');
+
+                //Convert this crap
+                //SocketGuild guild = _client.GetGuild();
+                //SocketGuildUser user = _client.GetGuild();
+                //SocketGuildUser target = _client.GetGuild();
+
+
+                //await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).First());
+                //await SendInfo(arg, MessageType.FriendRoleRemoved, target, user);
+                //Console.WriteLine($"-> Success: \"{roleFriend}\" Role has been removed from {target.DisplayName}.");
+            }
+            await arg.DeferAsync();
         }
 
         private async Task Client_JoinedGuild(SocketGuild arg)
@@ -111,9 +133,17 @@ namespace Janitor.Handler
                     }
                     else
                     {
-                        await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).First());
-                        await SendInfo(arg, MessageType.FriendRoleRemoved, target, user);
-                        Console.WriteLine($"-> Success: \"{roleFriend}\" Role has been removed from {target.DisplayName}.");
+                        //TODO Set MEsSaGe!
+
+                        await arg.RespondAsync(embed: new EmbedBuilder()
+                        {
+                            Title = "rem",
+                            Color = Color.Red,
+                        }.Build(),
+                        components: new ComponentBuilder()
+                        .WithButton("Remove", $"remove_{target}_{user}_{guild}\",", ButtonStyle.Danger)
+                        .Build(),
+                        ephemeral: true);
                     }
                 }
                 else
