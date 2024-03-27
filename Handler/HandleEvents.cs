@@ -13,7 +13,9 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        string roleFriend = "Friend";
+        const string roleFriend = "Friend";
+        const string addRoleCmd = $"Test Add {roleFriend} Role";
+        const string removeRoleCmd = $"Remove {roleFriend} Role";
 
         //A simple list of some Janitor related sayings
         List<string> status = new List<string>()
@@ -59,7 +61,7 @@ namespace Janitor.Handler
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
 
-            if (command == $"Add {roleFriend} Role")
+            if (command == addRoleCmd)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"Add Friend Role\" for {target.DisplayName}");
 
@@ -98,7 +100,7 @@ namespace Janitor.Handler
                     Console.WriteLine($"-> Fail: NotAllowed");
                 }
             }
-            else if (command == $"Remove {roleFriend} Role")
+            else if (command == removeRoleCmd)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"Remove Friend Role\" for {target.DisplayName}");
 
@@ -215,8 +217,8 @@ namespace Janitor.Handler
             var guildUserCommandAddRole = new UserCommandBuilder();
             var guildUserCommandRemoveRole = new UserCommandBuilder();
 
-            guildUserCommandAddRole.WithName($"Add {roleFriend} Role");
-            guildUserCommandRemoveRole.WithName($"Remove {roleFriend} Role");
+            guildUserCommandAddRole.WithName(addRoleCmd);
+            guildUserCommandRemoveRole.WithName(removeRoleCmd);
 
             try
             {
