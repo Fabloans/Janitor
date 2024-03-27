@@ -57,8 +57,8 @@ namespace Janitor.Handler
 
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
-
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {user.DisplayName} invoked Janitor for {target.DisplayName}");
+                        
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked Janitor for {target.DisplayName}");
 
             if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
             {
@@ -74,7 +74,7 @@ namespace Janitor.Handler
                 }
                 else if (target.IsBot)
                 {
-                    await SendInfo(arg, MessageType.BotCantHaveRole);
+                    await SendInfo(arg, MessageType.BotCantHaveRole, target);
                     Console.WriteLine($"-> Fail: BotCantHaveRole");
                 }
                 else if (target.Roles.Contains(roleJanitor))
@@ -86,7 +86,7 @@ namespace Janitor.Handler
                 {
                     await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
                     await SendInfo(arg, MessageType.UserHasRoleNow, target, user);
-                    Console.WriteLine($"-> Success: {target.DisplayName} has been assign the \"{roleFriend}\" Role");
+                    Console.WriteLine($"-> Success: {target.DisplayName} has been assigned the \"{roleFriend}\" Role");
                 }
             }
             else
@@ -108,7 +108,10 @@ namespace Janitor.Handler
                     col = Color.Red;
                     break;
                 case MessageType.BotCantHaveRole:
-                    text = $"A bot can't have the Role \"{roleFriend}\"!";
+                    if (target.DisplayName == "Janitor")
+                        text = $"As much as I love you, I can't be your friend. :(";
+                    else
+                        text = $"A bot can't have the Role \"{roleFriend}\"!";
                     col = Color.Red;
                     break;
                 case MessageType.UserHasRoleNow:
@@ -199,8 +202,10 @@ namespace Janitor.Handler
             {
                 while (true)
                 {
-                    _client.SetCustomStatusAsync(status[new Random().Next(status.Count)]);
-                    var delay = TimeSpan.FromHours(new Random().Next(1, 24));
+                    var BotStatus = status[new Random().Next(status.Count)];
+                    var delay = TimeSpan.FromHours(new Random().Next(1, 6));
+                    _client.SetCustomStatusAsync(BotStatus);
+                    Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Set bot status to \"{BotStatus}\". Sleeping for {delay}h.");
                     Thread.Sleep(delay);
                 }
             });
