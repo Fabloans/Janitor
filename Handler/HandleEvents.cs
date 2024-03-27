@@ -67,8 +67,8 @@ namespace Janitor.Handler
                 {
                     if (user == target)
                     {
-                        await SendInfo(arg, MessageType.CantAddRoleToYourself);
-                        Console.WriteLine($"-> Fail: CantAddRoleToYourself");
+                        await SendInfo(arg, MessageType.CantEditYourself);
+                        Console.WriteLine($"-> Fail: CantEditYourself");
                     }
                     else if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
                     {
@@ -106,8 +106,8 @@ namespace Janitor.Handler
                 {
                     if (user == target)
                     {
-                        await SendInfo(arg, MessageType.CantAddRoleToYourself);
-                        Console.WriteLine($"-> Fail: CantAddRoleToYourself");
+                        await SendInfo(arg, MessageType.CantEditYourself);
+                        Console.WriteLine($"-> Fail: CantEditYourself");
                     }
                     else if (target.Roles.Where(x => x.Name == roleFriend).Count() != 1)
                     {
@@ -162,7 +162,7 @@ namespace Janitor.Handler
                     text = $"({target.DisplayName}) already got the Role \"{roleFriend}\"!";
                     col = Color.Blue;
                     break;
-                case MessageType.CantAddRoleToYourself:
+                case MessageType.CantEditYourself:
                     text = $"You seem to have emotional problems. Try to join voice, we might be able to help you. :melting_face:";
                     col = Color.Blue;
                     break;

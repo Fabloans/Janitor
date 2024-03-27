@@ -3,7 +3,7 @@
     public enum MessageType
     {
         BotCantHaveRole,
-        CantAddRoleToYourself,
+        CantEditYourself,
         FriendRoleRemoved,
         JanitorCantHaveRole,
         UserDoesntHaveRole,
