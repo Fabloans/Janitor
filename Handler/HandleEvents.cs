@@ -175,17 +175,14 @@ namespace Janitor.Handler
         private async void AddUserCommand(SocketGuild guild)
         {
             var guildUserCommand = new UserCommandBuilder();
-            var guildMessageCommand = new MessageCommandBuilder();
 
             guildUserCommand.WithName($"Add {roleFriend} Role");
-            guildMessageCommand.WithName($"Add {roleFriend} Role");
 
             try
             {
                 await guild.BulkOverwriteApplicationCommandAsync(new ApplicationCommandProperties[]
                 {
                     guildUserCommand.Build(),
-                    guildMessageCommand.Build(),
                 });
 
             }
