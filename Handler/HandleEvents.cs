@@ -14,7 +14,7 @@ namespace Janitor.Handler
         DiscordSocketClient _client;
 
         const string roleFriend = "Friend";
-        const string addRoleCmd = $"Test Add {roleFriend} Role";
+        const string addRoleCmd = $"Add {roleFriend} Role";
         const string removeRoleCmd = $"Remove {roleFriend} Role";
 
         //A simple list of some Janitor related sayings
@@ -61,18 +61,18 @@ namespace Janitor.Handler
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
 
-            if (command == addRoleCmd)
-            {
-                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"Add Friend Role\" for {target.DisplayName}");
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"{command}\" for {target.DisplayName}");
 
-                if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
-                {
-                    if (user == target)
-                    {
-                        await SendInfo(arg, MessageType.CantEditYourself);
-                        Console.WriteLine($"-> Fail: CantEditYourself");
-                    }
-                    else if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
+            if (user == target)
+            {
+                await SendInfo(arg, MessageType.CantEditYourself);
+                Console.WriteLine($"-> Fail: CantEditYourself");
+            }
+            else if (command == addRoleCmd)
+            {
+                 if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
+                 {
+                    if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
                     {
                         await SendInfo(arg, MessageType.UserHasRoleAlready, target);
                         Console.WriteLine($"-> Fail: UserHasRoleAlready");
@@ -89,7 +89,7 @@ namespace Janitor.Handler
                     }
                     else
                     {
-                        await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
+                        await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).First());
                         await SendInfo(arg, MessageType.UserHasRoleNow, target, user);
                         Console.WriteLine($"-> Success: {target.DisplayName} has been assigned the \"{roleFriend}\" Role");
                     }
@@ -102,26 +102,24 @@ namespace Janitor.Handler
             }
             else if (command == removeRoleCmd)
             {
-                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"Remove Friend Role\" for {target.DisplayName}");
-
                 if (user.Roles.Contains(roleManager))
                 {
-                    if (user == target)
-                    {
-                        await SendInfo(arg, MessageType.CantEditYourself);
-                        Console.WriteLine($"-> Fail: CantEditYourself");
-                    }
-                    else if (target.Roles.Where(x => x.Name == roleFriend).Count() != 1)
+                    if (target.Roles.Where(x => x.Name == roleFriend).Count() == 0)
                     {
                         await SendInfo(arg, MessageType.UserDoesntHaveRole, target);
                         Console.WriteLine($"-> Fail: UserDoesntHaveRole");
                     }
                     else
                     {
-                        await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
+                        await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).First());
                         await SendInfo(arg, MessageType.FriendRoleRemoved, target, user);
                         Console.WriteLine($"-> Success: \"{roleFriend}\" Role has been removed from {target.DisplayName}.");
                     }
+                }
+                else
+                {
+                    await SendInfo(arg, MessageType.NotAllowed);
+                    Console.WriteLine($"-> Fail: NotAllowed");
                 }
             }
         }
