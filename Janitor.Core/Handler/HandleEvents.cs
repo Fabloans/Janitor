@@ -62,7 +62,7 @@ namespace Janitor.Handler
                 await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
                 await arg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.");
 
-                LogMessage(user, target, RespondseMessageType.RemoveFriendRole.ToString(), removeRoleCmd, InformationType.Information);
+                LogMessage(user, target, RespondseMessageType.RemoveFriendRole.ToString(), removeRoleCmd, InformationType.Success);
             }
             await arg.DeferAsync();
         }
@@ -83,6 +83,8 @@ namespace Janitor.Handler
 
             var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
             var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
+
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"{command}\" for {target.DisplayName}");
 
             if (user == target)
                 await SendInfo(arg, RespondseMessageType.CantEditYourself, target, user);
@@ -123,6 +125,7 @@ namespace Janitor.Handler
         {
             string text = string.Empty;
             Color col = Color.Red;
+            InformationType result = InformationType.Error;
 
             switch (type)
             {
@@ -141,9 +144,11 @@ namespace Janitor.Handler
                 case RespondseMessageType.UserHasRoleNow:
                     text = $"({target.DisplayName}) has been granted the Role \"{roleFriend}\"!";
                     col = Color.Green;
+                    result = InformationType.Success;
                     break;
                 case RespondseMessageType.RemoveFriendRole:
                     text = $"({target.DisplayName}) will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
+                    result = InformationType.Information;
                     break;
                 case RespondseMessageType.JanitorCantHaveRole:
                     text = $"A Janitor can't have the Role \"{roleFriend}\"! They're cool enough already!";
@@ -168,22 +173,28 @@ namespace Janitor.Handler
             if (type == RespondseMessageType.UserHasRoleNow)
                 await msg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.");
 
-            LogMessage(user, target, type.ToString(), msg.CommandName, col == Color.Red ? InformationType.Error : InformationType.Information);
+            LogMessage(user, target, type.ToString(), msg.CommandName, result);
         }
 
-        private async void LogMessage(SocketGuildUser fromUser, SocketGuildUser targetUser, string message, string cmd, InformationType type = InformationType.Information)
+        private async void LogMessage(SocketGuildUser fromUser, SocketGuildUser targetUser, string message, string cmd, InformationType result = InformationType.Information)
         {
             SocketTextChannel channel = (SocketTextChannel)targetUser.Guild.Channels.Where(x => x.Name == modChnnelName).FirstOrDefault();
+            Color col = Color.Red;
+
+            if (result == InformationType.Success)
+                col = Color.Green;
+            else if (result == InformationType.Information)
+                col = Color.Blue;
 
             var emb = new EmbedBuilder()
             {
-                Title = message,
+                Title = $"{result}: {message}",
                 Description = $"{fromUser.DisplayName} invoked \"{cmd}\" for {targetUser.DisplayName}",
                 Timestamp = DateTime.Now,
-                Color = type == InformationType.Information ? Color.Green : Color.Red,
+                Color = col,
             };
 
-            Console.WriteLine($"{type} -> {message}");
+            Console.WriteLine($"-> {result}: {message}");
             await channel.SendMessageAsync(embed: emb.Build());
         }
 
