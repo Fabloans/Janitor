@@ -241,10 +241,9 @@ namespace Janitor.Handler
                 while (true)
                 {
                     var BotStatus = status[new Random().Next(status.Count)];
-                    var delay = TimeSpan.FromHours(new Random().Next(1, 6));
                     _client.SetCustomStatusAsync(BotStatus);
-                    Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Set bot status to \"{BotStatus}\". Sleeping for {delay}h.");
-                    Thread.Sleep(delay);
+                    Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Set bot status to \"{BotStatus}\".");
+                    Thread.Sleep(TimeSpan.FromHours(1));
                 }
             });
             t.Start();
