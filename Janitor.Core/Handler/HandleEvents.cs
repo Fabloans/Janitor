@@ -62,7 +62,7 @@ namespace Janitor.Handler
                 await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
                 await arg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.");
 
-                LogMessage(user, target, RespondseMessageType.RemoveRole.ToString(), InformationType.Information);
+                LogMessage(user, target, RespondseMessageType.RemoveFriendRole.ToString(), removeRoleCmd, InformationType.Information);
             }
             await arg.DeferAsync();
         }
@@ -112,7 +112,7 @@ namespace Janitor.Handler
                     if (target.Roles.Where(x => x.Name == roleFriend).Count() == 0)
                         await SendInfo(arg, RespondseMessageType.UserDoesntHaveRole, target, user);
                     else
-                        await SendInfo(arg, RespondseMessageType.RemoveRole, target, user, new ComponentBuilder().WithButton($"Remove \"{roleFriend}\"", $"rf_{target.Id}", ButtonStyle.Danger).Build());
+                        await SendInfo(arg, RespondseMessageType.RemoveFriendRole, target, user, new ComponentBuilder().WithButton($"Remove \"{roleFriend}\"", $"rf_{target.Id}", ButtonStyle.Danger).Build());
                 }
                 else
                     await SendInfo(arg, RespondseMessageType.NotAllowed, target, user);
@@ -142,13 +142,8 @@ namespace Janitor.Handler
                     text = $"({target.DisplayName}) has been granted the Role \"{roleFriend}\"!";
                     col = Color.Green;
                     break;
-                case RespondseMessageType.FriendRoleRemoved:
-                    text = $"Removed the Role \"{roleFriend}\" from ({target.DisplayName})!";
-                    col = Color.Green;
-                    break;
-                case RespondseMessageType.RemoveRole:
-                    text = $"({target}) has already the Role \"{roleFriend}\"!\r\nDo you wish to remove it?";
-                    col = Color.Green;
+                case RespondseMessageType.RemoveFriendRole:
+                    text = $"({target.DisplayName}) will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
                     break;
                 case RespondseMessageType.JanitorCantHaveRole:
                     text = $"A Janitor can't have the Role \"{roleFriend}\"! They're cool enough already!";
@@ -172,22 +167,20 @@ namespace Janitor.Handler
 
             if (type == RespondseMessageType.UserHasRoleNow)
                 await msg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.");
-            if (type == RespondseMessageType.FriendRoleRemoved)
-                await msg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.");
 
-            LogMessage(user, target, type.ToString(), col == Color.Red ? InformationType.Error : InformationType.Information);
+            LogMessage(user, target, type.ToString(), msg.CommandName, col == Color.Red ? InformationType.Error : InformationType.Information);
         }
 
-        private async void LogMessage(SocketGuildUser fromUser, SocketGuildUser targetUser, string message, InformationType type = InformationType.Information)
+        private async void LogMessage(SocketGuildUser fromUser, SocketGuildUser targetUser, string message, string cmd, InformationType type = InformationType.Information)
         {
             SocketTextChannel channel = (SocketTextChannel)targetUser.Guild.Channels.Where(x => x.Name == modChnnelName).FirstOrDefault();
 
             var emb = new EmbedBuilder()
             {
                 Title = message,
-                Description = $"{fromUser.DisplayName} invoked \"{message}\" for {targetUser.DisplayName}",
+                Description = $"{fromUser.DisplayName} invoked \"{cmd}\" for {targetUser.DisplayName}",
                 Timestamp = DateTime.Now,
-                Color = type == InformationType.Information ? Color.Blue : Color.Red,
+                Color = type == InformationType.Information ? Color.Green : Color.Red,
             };
 
             Console.WriteLine($"{type} -> {message}");

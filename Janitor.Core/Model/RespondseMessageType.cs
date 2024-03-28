@@ -4,12 +4,11 @@
     {
         BotCantHaveRole,
         CantEditYourself,
-        FriendRoleRemoved,
         JanitorCantHaveRole,
         UserDoesntHaveRole,
         UserHasRoleAlready,
         UserHasRoleNow,
         NotAllowed,
-        RemoveRole,
+        RemoveFriendRole,
     }
 }
