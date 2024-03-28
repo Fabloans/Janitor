@@ -1,0 +1,14 @@
+version: '3.5'
+
+
+services:
+  janitor:
+    build:
+      context: .
+      dockerfile: Janitor.Core/Dockerfile
+    env_file:
+      - env.ini
+        
+      
+
+
