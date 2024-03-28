@@ -36,12 +36,20 @@ namespace Janitor
                 client.Log += LogAsync;
                 client.Ready += ReadyAsync;
 
-                await client.LoginAsync(TokenType.Bot,
-                    _config["Token"]);
+#if DEBUG
+                    await client.LoginAsync(TokenType.Bot,
+                        _config["TestToken"]);
+#else
+                    await client.LoginAsync(TokenType.Bot,
+                        _config["Token"]);
+#endif
+
                 await client.StartAsync();
 
                 await Task.Delay(Timeout.Infinite);
+                await _client.StopAsync();
             }
+
         }
 
         private Task LogAsync(LogMessage log)

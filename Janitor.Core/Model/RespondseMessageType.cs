@@ -1,6 +1,6 @@
 ﻿namespace Janitor.Model
 {
-    public enum MessageType
+    public enum RespondseMessageType
     {
         BotCantHaveRole,
         CantEditYourself,
@@ -10,5 +10,6 @@
         UserHasRoleAlready,
         UserHasRoleNow,
         NotAllowed,
+        RemoveRole,
     }
 }
