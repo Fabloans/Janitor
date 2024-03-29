@@ -16,7 +16,7 @@ namespace Janitor.Handler
         const string roleFriend = "Friend";
         const string addRoleCmd = $"Add {roleFriend} Role";
         const string removeRoleCmd = $"Remove {roleFriend} Role";
-        const string modChnnelName = "mod-log";
+        const string modChannelName = "mod-log";
 
         //A simple list of some Janitor related sayings
         List<string> status = new List<string>()
@@ -178,7 +178,7 @@ namespace Janitor.Handler
 
         private async void LogMessage(SocketGuildUser fromUser, SocketGuildUser targetUser, string message, string cmd, InformationType result = InformationType.Information)
         {
-            SocketTextChannel channel = (SocketTextChannel)targetUser.Guild.Channels.Where(x => x.Name == modChnnelName).FirstOrDefault();
+            SocketTextChannel channel = (SocketTextChannel)targetUser.Guild.Channels.Where(x => x.Name == modChannelName).FirstOrDefault();
             Color col = Color.Red;
 
             if (result == InformationType.Success)
@@ -188,9 +188,9 @@ namespace Janitor.Handler
 
             var emb = new EmbedBuilder()
             {
-                Title = $"{result}: {message}",
-                Description = $"{fromUser.DisplayName} invoked \"{cmd}\" for {targetUser.DisplayName}",
-                Timestamp = DateTime.Now,
+                //Title = $"{result}: {message}",
+                Description = $"{fromUser.DisplayName} invoked \"{cmd}\" for {targetUser.DisplayName} -> {result}: {message}",
+                //Timestamp = DateTime.Now,
                 Color = col,
             };
 
