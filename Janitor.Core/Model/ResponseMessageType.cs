@@ -4,6 +4,7 @@
     {
         BotCantHaveRole,
         CantEditYourself,
+        FriendRoleRemoved,
         JanitorCantHaveRole,
         UserDoesntHaveRole,
         UserHasRoleAlready,
