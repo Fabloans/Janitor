@@ -54,15 +54,21 @@ namespace Janitor.Handler
             var uid = arg.Data.CustomId.ToString().Split('_')[1];
             var target = guild.GetUser(Convert.ToUInt64(uid));
             var user = guild.GetUser(arg.User.Id);
-            var name = target.GlobalName == string.Empty ? target.Username : target.GlobalName;
             var role = await GetOrCreateRole(guild, roleFriend);
 
             if (target.Roles.Contains(role))
             {
                 await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
-                await arg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.");
 
-                LogMessage(user, target, ResponseMessageType.RemoveFriendRole.ToString(), removeRoleCmd, InformationType.Success);
+                var emb = new EmbedBuilder()
+                {
+                    Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
+                    Color = Color.Red,
+                };
+
+                await arg.Channel.SendMessageAsync(embed: emb.Build());
+
+                LogMessage(user, target, ResponseMessageType.FriendRoleRemoved.ToString(), removeRoleCmd, InformationType.Success);
             }
             await arg.DeferAsync();
         }
@@ -114,7 +120,7 @@ namespace Janitor.Handler
                     if (target.Roles.Where(x => x.Name == roleFriend).Count() == 0)
                         await SendInfo(arg, ResponseMessageType.UserDoesntHaveRole, target, user);
                     else
-                        await SendInfo(arg, ResponseMessageType.RemoveFriendRole, target, user, new ComponentBuilder().WithButton($"Remove \"{roleFriend}\"", $"rf_{target.Id}", ButtonStyle.Danger).Build());
+                        await SendInfo(arg, ResponseMessageType.RemoveFriendRole, target, user, new ComponentBuilder().WithButton($"Remove \"{roleFriend}\" Role", $"rf_{target.Id}", ButtonStyle.Danger).Build());
                 }
                 else
                     await SendInfo(arg, ResponseMessageType.NotAllowed, target, user);
@@ -142,7 +148,7 @@ namespace Janitor.Handler
                     text = $"({target.DisplayName}) doesn't have the Role \"{roleFriend}\"!";
                     break;
                 case ResponseMessageType.UserHasRoleNow:
-                    text = $"({target.DisplayName}) has been granted the Role \"{roleFriend}\"!";
+                    text = $"\"{roleFriend}\" Role has been granted to {target.Mention} by {user.Mention}.";
                     col = Color.Green;
                     result = InformationType.Success;
                     break;
@@ -164,14 +170,11 @@ namespace Janitor.Handler
 
             await msg.RespondAsync(embed: new EmbedBuilder()
             {
-                Title = text,
+                Description = text,
                 Color = col,
             }.Build(),
             components: component,
-            ephemeral: true);
-
-            if (type == ResponseMessageType.UserHasRoleNow)
-                await msg.Channel.SendMessageAsync($"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.");
+            ephemeral: type == ResponseMessageType.UserHasRoleNow ? false : true);
 
             LogMessage(user, target, type.ToString(), msg.CommandName, result);
         }
