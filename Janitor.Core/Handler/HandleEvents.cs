@@ -188,8 +188,7 @@ namespace Janitor.Handler
 
             var emb = new EmbedBuilder()
             {
-                //Title = $"{result}: {message}",
-                Description = $"{fromUser.DisplayName} invoked \"{cmd}\" for {targetUser.DisplayName} -> {result}: {message}",
+                Description = $"{fromUser.Mention} invoked \"{cmd}\" for {targetUser.Mention}\r\n-> {result}: {message}",
                 //Timestamp = DateTime.Now,
                 Color = col,
             };
