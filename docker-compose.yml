@@ -4,5 +4,5 @@ version: '3.5'
 services:
   janitor:
     build:
-      context: .
+      content: .
       dockerfile: Janitor.Core/Dockerfile
