@@ -5,5 +5,4 @@ services:
   janitor:
     build:
       content: .
-      pull_policy: build
       dockerfile: Janitor.Core/Dockerfile
