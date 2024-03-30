@@ -68,7 +68,7 @@ namespace Janitor.Handler
 
                 await arg.Channel.SendMessageAsync(embed: emb.Build());
 
-                LogMessage(user, target, ResponseMessageType.FriendRoleRemoved.ToString(), removeRoleCmd, InformationType.Success);
+                LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
             }
             await arg.DeferAsync();
         }
@@ -176,12 +176,13 @@ namespace Janitor.Handler
             components: component,
             ephemeral: type == ResponseMessageType.UserHasRoleNow ? false : true);
 
-            LogMessage(user, target, type.ToString(), msg.CommandName, result);
+            LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{msg.CommandName}\" for {target.Mention}", type, result);
         }
 
-        private async void LogMessage(SocketGuildUser fromUser, SocketGuildUser targetUser, string message, string cmd, InformationType result = InformationType.Information)
+        private async void LogMessage(string server, string message, ResponseMessageType type, InformationType result = InformationType.Information)
         {
-            SocketTextChannel channel = (SocketTextChannel)targetUser.Guild.Channels.Where(x => x.Name == modChannelName).FirstOrDefault();
+            SocketTextChannel channel = (SocketTextChannel)_client.Guilds.Where(x => x.Name == server).First().Channels.Where(x => x.Name == modChannelName).First();
+
             Color col = Color.Red;
 
             if (result == InformationType.Success)
@@ -191,12 +192,12 @@ namespace Janitor.Handler
 
             var emb = new EmbedBuilder()
             {
-                Description = $"{fromUser.Mention} invoked \"{cmd}\" for {targetUser.Mention}\r\n-> {result}: {message}",
+                Description = $"{message}\r\n-> {result}: {type}",
                 //Timestamp = DateTime.Now,
                 Color = col,
             };
 
-            Console.WriteLine($"-> {result}: {message}");
+            Console.WriteLine($"-> {result}: {type}");
             await channel.SendMessageAsync(embed: emb.Build());
         }
 
