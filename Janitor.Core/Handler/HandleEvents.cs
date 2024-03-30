@@ -13,8 +13,10 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.0.1";
+        const string BotVersion = "1.0.0.2";
         const string roleFriend = "Friend";
+        const string roleJanitor = "Janitor";
+        const string roleManager = "Role Manager";
         const string addRoleCmd = $"Add {roleFriend} Role";
         const string removeRoleCmd = $"Remove {roleFriend} Role";
         const string modChannelName = "mod-log";
@@ -77,7 +79,7 @@ namespace Janitor.Handler
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
             //If Client is ready Create Management role if it does not exist
-            await GetOrCreateRole(arg, "Role Manager");
+            await GetOrCreateRole(arg, roleManager);
             AddUserCommand(arg);
         }
 
@@ -88,8 +90,8 @@ namespace Janitor.Handler
             var user = arg.User as SocketGuildUser;
             var guild = _client.GetGuild((ulong)arg.GuildId);
 
-            var roleManager = guild.Roles.Where(x => x.Name == "Role Manager").First();
-            var roleJanitor = guild.Roles.Where(x => x.Name == "Janitor" && !x.IsManaged).First();
+            var ManagerRole = guild.Roles.Where(x => x.Name == roleManager).First();
+            var JanitorRole = guild.Roles.Where(x => x.Name == roleJanitor && !x.IsManaged).First();
 
             Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"{command}\" for {target.DisplayName}");
 
@@ -97,13 +99,13 @@ namespace Janitor.Handler
                 await SendInfo(arg, ResponseMessageType.CantEditYourself, target, user);
             else if (command == addRoleCmd)
             {
-                if (user.Roles.Contains(roleManager) || user.Roles.Contains(roleJanitor))
+                if (user.Roles.Contains(ManagerRole) || user.Roles.Contains(JanitorRole))
                 {
                     if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
                         await SendInfo(arg, ResponseMessageType.UserHasRoleAlready, target, user);
                     else if (target.IsBot)
                         await SendInfo(arg, ResponseMessageType.BotCantHaveRole, target, user);
-                    else if (target.Roles.Contains(roleJanitor))
+                    else if (target.Roles.Contains(JanitorRole))
                         await SendInfo(arg, ResponseMessageType.JanitorCantHaveRole, target, user);
                     else
                     {
@@ -116,7 +118,7 @@ namespace Janitor.Handler
             }
             else if (command == removeRoleCmd)
             {
-                if (user.Roles.Contains(roleManager))
+                if (user.Roles.Contains(ManagerRole))
                 {
                     if (target.Roles.Where(x => x.Name == roleFriend).Count() == 0)
                         await SendInfo(arg, ResponseMessageType.UserDoesntHaveRole, target, user);
@@ -158,7 +160,7 @@ namespace Janitor.Handler
                     result = InformationType.Information;
                     break;
                 case ResponseMessageType.JanitorCantHaveRole:
-                    text = $"A Janitor can't have the Role \"{roleFriend}\"! They're cool enough already!";
+                    text = $"A {roleJanitor} can't have the Role \"{roleFriend}\"! They're cool enough already!";
                     break;
                 case ResponseMessageType.UserHasRoleAlready:
                     text = $"({target.DisplayName}) already got the Role \"{roleFriend}\"!";
@@ -208,8 +210,8 @@ namespace Janitor.Handler
 
             foreach (var guild in guilds)
             {
-                await GetOrCreateRole(guild, "Role Manager");
-                await GetOrCreateRole(guild, "Janitor");
+                await GetOrCreateRole(guild, roleJanitor);
+                await GetOrCreateRole(guild, roleManager);
 
                 AddUserCommand(guild);
 

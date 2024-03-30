@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Janitor.Handler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 
 namespace Janitor
 {
@@ -62,7 +61,7 @@ namespace Janitor
         private async Task ReadyAsync()
         {
             Console.WriteLine();
-            Console.WriteLine($"Connected as -> {_client.CurrentUser}");
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Connected as -> {_client.CurrentUser}");
         }
 
         private ServiceProvider ConfigureServices()
