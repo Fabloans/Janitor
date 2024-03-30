@@ -3,6 +3,6 @@ version: '3.5'
 
 services:
   janitor:
-    build:
-      context: .
+    build: .
+      pull_policy: build
       dockerfile: Janitor.Core/Dockerfile
