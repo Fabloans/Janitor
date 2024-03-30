@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.0.2";
+        const string BotVersion = "1.0.0.3";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -215,8 +215,8 @@ namespace Janitor.Handler
 
                 AddUserCommand(guild);
 
-                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} started.");
-                LogMessage(guild.Name, $"Janitor Bot v{BotVersion} started.", ResponseMessageType.BotStarted, InformationType.Information);
+                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion}.");
+                LogMessage(guild.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotStarted, InformationType.Information);
             }
 
             SetStatus();
