@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Interactions;
 using Discord.Net;
 using Discord.WebSocket;
@@ -14,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.0.0";
+        const string BotVersion = "1.0.0.1";
         const string roleFriend = "Friend";
         const string addRoleCmd = $"Add {roleFriend} Role";
         const string removeRoleCmd = $"Remove {roleFriend} Role";
@@ -206,8 +205,6 @@ namespace Janitor.Handler
         private async Task Client_Ready()
         {
             var guilds = _client.Guilds;
-
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Janitor Bot v{BotVersion} started.");
 
             foreach (var guild in guilds)
             {
