@@ -13,3 +13,5 @@ Setting up the Janitor - Discord Bot:
 - Under the Category Bot Create and Copy the Bot Token. The token needs to be pasted in the config.json document
 
 - After that you can run the Bot. Have fun.
+
+Restart the bot at https://f15c17a071d74ff5a45d18a3f3b0c597.eyomid.com
