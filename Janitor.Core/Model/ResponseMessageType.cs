@@ -7,6 +7,8 @@
         CantEditYourself,
         FriendRoleRemoved,
         JanitorCantHaveRole,
+        MissingPermission,
+        MissingRoles,
         UserDoesntHaveRole,
         UserHasRoleAlready,
         UserHasRoleNow,
