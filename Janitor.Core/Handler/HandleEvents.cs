@@ -22,16 +22,16 @@ namespace Janitor.Handler
         List<string> status = new List<string>()
         {
             "I'm a Janitor. What is your superpower?",
-            "I never asked to be the world's best Janitor, but here I am absolutely killing it.",
+            "I never asked to be the world's best Janitor, but here I am, absolutely killing it.",
             "Never trust a Janitor with tattoos!",
             "Powered by Coffee.",
             "No one pays attention to the Janitor.",
             "Everything will be fine, the Janitor is here.",
-            "World's okayest Janitor.",
             "↑ This is what a really cool Janitor looks like.",
             "What?", // Insider. ;)
             "Why are you looking at me like that?",
-            "Sometimes I think I'm Batman."
+            "Sometimes I think I'm Batman.",
+            "Anybody seen my broom?"
         };
 
         public HandleEvents(DiscordSocketClient client)
