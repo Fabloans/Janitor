@@ -86,6 +86,7 @@ namespace Janitor.Handler
                         Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
                         Color = Color.Red,
                     }.Build());
+
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
                 }            
             }
@@ -94,7 +95,7 @@ namespace Janitor.Handler
 
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
-            //If Client is ready Create Management role if it does not exist
+            //If Client is ready, create Roles if they don't not exist
             await GetOrCreateRole(arg, roleFriend);
             await GetOrCreateRole(arg, roleJanitor);
             await GetOrCreateRole(arg, roleManager);
@@ -217,7 +218,7 @@ namespace Janitor.Handler
                 Color = col,
             }.Build(),
             components: component,
-            ephemeral: type == ResponseMessageType.UserHasRoleNow ? false : true);         
+            ephemeral: type == ResponseMessageType.UserHasRoleNow ? false : true);
 
             LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{msg.CommandName}\" for {target.Mention}", type, result);
         }
@@ -242,7 +243,7 @@ namespace Janitor.Handler
 
             Console.WriteLine($"-> {result}: {type}");
 
-            try
+            try //If channel doesn't exist or we don't have permission, just ignore.
             {
                 if (channel != null)
                     await channel.SendMessageAsync(embed: emb.Build());
