@@ -13,6 +13,6 @@
         UserHasRoleAlready,
         UserHasRoleNow,
         NotAllowed,
-        RemoveFriendRole,
+        RemoveFriendRole
     }
 }

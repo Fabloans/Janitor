@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.2";
+        const string BotVersion = "1.0.1.3";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -233,19 +233,16 @@ namespace Janitor.Handler
             else if (result == InformationType.Information)
                 col = Color.Blue;
 
-            var emb = new EmbedBuilder()
-            {
-                Description = $"{message}\r\n-> {result}: {type}",
-                //Timestamp = DateTime.Now,
-                Color = col,
-            };
-
             Console.WriteLine($"-> {result}: {type}");
 
             try //If channel doesn't exist or we don't have permission, just ignore.
             {
                 if (channel != null)
-                    await channel.SendMessageAsync(embed: emb.Build());
+                    await channel.SendMessageAsync(embed: new EmbedBuilder()
+                    {
+                        Description = $"{message}\r\n-> {result}: {type}",
+                        Color = col,
+                    }.Build());
             }
             catch
             {
@@ -258,10 +255,6 @@ namespace Janitor.Handler
 
             foreach (var guild in guilds)
             {
-                await GetOrCreateRole(guild, roleFriend);
-                await GetOrCreateRole(guild, roleJanitor);
-                await GetOrCreateRole(guild, roleManager);
-
                 AddUserCommand(guild);
 
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion}.");
@@ -311,7 +304,7 @@ namespace Janitor.Handler
 
         private async void SetStatus()
         {
-            var t = new Thread(x =>
+            var StatusThread = new Thread(x =>
             {
                 while (true)
                 {
@@ -321,7 +314,7 @@ namespace Janitor.Handler
                     Thread.Sleep(TimeSpan.FromHours(1));
                 }
             });
-            t.Start();
+            StatusThread.Start();
         }
     }
 }
