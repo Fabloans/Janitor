@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.0";
+        const string BotVersion = "1.0.1.1";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -69,23 +69,23 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    var emb = new EmbedBuilder()
+                    await arg.RespondAsync(embed: new EmbedBuilder()
                     {
                         Description = $"ERROR: Missing permission \"Role Manager\"!",
                         Color = Color.Red,
-                    };
-                    await arg.Channel.SendMessageAsync(embed: emb.Build());
+                    }.Build(),
+                    ephemeral: true);
+                    
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.MissingPermission, InformationType.Error);
                 }
 
                 if (success)
                 {
-                    var emb = new EmbedBuilder()
+                    await arg.RespondAsync(embed: new EmbedBuilder()
                     {
                         Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
                         Color = Color.Red,
-                    };
-                    await arg.Channel.SendMessageAsync(embed: emb.Build());
+                    }.Build());
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
                 }            
             }
@@ -172,9 +172,6 @@ namespace Janitor.Handler
 
             switch (type)
             {
-                case ResponseMessageType.NotAllowed:
-                    text = "You are not allowed to do that!";
-                    break;
                 case ResponseMessageType.BotCantHaveRole:
                     if (target.DisplayName == _client.CurrentUser.Username)
                         text = $"As much as I love you, I can't be your friend. :(";
@@ -185,31 +182,33 @@ namespace Janitor.Handler
                     text = $"You seem to have emotional problems. Try to join voice, we might be able to help you. :melting_face:";
                     col = Color.Blue;
                     break;
+                case ResponseMessageType.JanitorCantHaveRole:
+                    text = $"A {roleJanitor} can't have the Role \"{roleFriend}\"! They're cool enough already!";
+                    break;
                 case ResponseMessageType.MissingPermission:
                     text = $"ERROR: Missing permission \"Role Manager\"!";
                     break;
                 case ResponseMessageType.MissingRoles:
                     text = $"ERROR: Either the \"{roleFriend}\", the \"{roleJanitor}\" or the \"{roleManager}\" Role is missing!";
                     break;
-                case ResponseMessageType.UserDoesntHaveRole:
-                    text = $"({target.DisplayName}) doesn't have the Role \"{roleFriend}\"!";
-                    break;
-                case ResponseMessageType.UserHasRoleNow:
-                    text = $"\"{roleFriend}\" Role has been granted to {target.Mention} by {user.Mention}.";
-                    col = Color.Green;
-                    result = InformationType.Success;
+                case ResponseMessageType.NotAllowed:
+                    text = "You are not allowed to do that!";
                     break;
                 case ResponseMessageType.RemoveFriendRole:
                     text = $"({target.DisplayName}) will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
                     result = InformationType.Information;
                     break;
-                case ResponseMessageType.JanitorCantHaveRole:
-                    text = $"A {roleJanitor} can't have the Role \"{roleFriend}\"! They're cool enough already!";
+                case ResponseMessageType.UserDoesntHaveRole:
+                    text = $"({target.DisplayName}) doesn't have the Role \"{roleFriend}\"!";
                     break;
                 case ResponseMessageType.UserHasRoleAlready:
                     text = $"({target.DisplayName}) already got the Role \"{roleFriend}\"!";
                     break;
-                
+                case ResponseMessageType.UserHasRoleNow:
+                    text = $"\"{roleFriend}\" Role has been granted to {target.Mention} by {user.Mention}.";
+                    col = Color.Green;
+                    result = InformationType.Success;
+                    break;                
             }
 
             await msg.RespondAsync(embed: new EmbedBuilder()
