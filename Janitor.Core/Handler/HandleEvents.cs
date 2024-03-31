@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.1";
+        const string BotVersion = "1.0.1.2";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -71,7 +71,7 @@ namespace Janitor.Handler
                 {
                     await arg.RespondAsync(embed: new EmbedBuilder()
                     {
-                        Description = $"ERROR: Missing permission \"Role Manager\"!",
+                        Description = $"ERROR: Missing permission \"Manage Roles\"!",
                         Color = Color.Red,
                     }.Build(),
                     ephemeral: true);
@@ -90,7 +90,6 @@ namespace Janitor.Handler
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
                 }            
             }
-            await arg.DeferAsync();
         }
 
         private async Task Client_JoinedGuild(SocketGuild arg)
@@ -187,7 +186,7 @@ namespace Janitor.Handler
                     text = $"A {roleJanitor} can't have the Role \"{roleFriend}\"! They're cool enough already!";
                     break;
                 case ResponseMessageType.MissingPermission:
-                    text = $"ERROR: Missing permission \"Role Manager\"!";
+                    text = $"ERROR: Missing permission \"Manage Roles\"!";
                     break;
                 case ResponseMessageType.MissingRoles:
                     text = $"ERROR: Either the \"{roleFriend}\", the \"{roleJanitor}\" or the \"{roleManager}\" Role is missing!";
