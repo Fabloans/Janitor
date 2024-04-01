@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.3";
+        const string BotVersion = "1.0.1.4";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -157,18 +157,19 @@ namespace Janitor.Handler
                     if (target.Roles.Where(x => x.Name == roleFriend).Count() == 0)
                         await SendInfo(arg, ResponseMessageType.UserDoesntHaveRole, target, user);
                     else
-                        await SendInfo(arg, ResponseMessageType.RemoveFriendRole, target, user, new ComponentBuilder().WithButton($"Remove \"{roleFriend}\" Role", $"rf_{target.Id}", ButtonStyle.Danger).Build());
+                        await SendInfo(arg, ResponseMessageType.RemoveFriendRole, target, user);
                 }
                 else
                     await SendInfo(arg, ResponseMessageType.NotAllowed, target, user);
             }
         }
 
-        private async Task SendInfo(SocketUserCommand msg, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user , MessageComponent component = null)
+        private async Task SendInfo(SocketUserCommand msg, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user)
         {
             string text = string.Empty;
             Color col = Color.Red;
             InformationType result = InformationType.Error;
+            MessageComponent component = null;
 
             switch (type)
             {
@@ -197,6 +198,7 @@ namespace Janitor.Handler
                 case ResponseMessageType.RemoveFriendRole:
                     text = $"({target.DisplayName}) will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
                     result = InformationType.Information;
+                    component = new ComponentBuilder().WithButton($"Remove \"{roleFriend}\" Role", $"rf_{target.Id}", ButtonStyle.Danger).Build();
                     break;
                 case ResponseMessageType.UserDoesntHaveRole:
                     text = $"({target.DisplayName}) doesn't have the Role \"{roleFriend}\"!";
