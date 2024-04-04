@@ -237,18 +237,18 @@ namespace Janitor.Handler
 
             Console.WriteLine($"-> {result}: {type}");
 
-            try //If channel doesn't exist or we don't have permission, just ignore.
-            {
-                if (channel != null)
+            if (channel != null) //If channel doesn't exist or we don't have permission, just ignore.
+                try
+                {
                     await channel.SendMessageAsync(embed: new EmbedBuilder()
                     {
                         Description = $"{message}\r\n-> {result}: {type}",
                         Color = col,
                     }.Build());
-            }
-            catch
-            {
-            }
+                }
+                catch
+                {
+                }
         }
 
         private async Task Client_Ready()
