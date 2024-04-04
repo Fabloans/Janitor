@@ -1,8 +1,8 @@
-version: '3.5'
-
+version: '3.4'
 
 services:
-  janitor:
+  janitor.core:
+    image: ${DOCKER_REGISTRY-}janitorcore
     build:
-      content: .
-      dockerfile: Janitor.Core/Dockerfile
+      context: Janitor.Core
+      dockerfile: Dockerfile
