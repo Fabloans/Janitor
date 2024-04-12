@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.5";
+        const string BotVersion = "1.0.1.6";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -86,7 +86,7 @@ namespace Janitor.Handler
                         await arg.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         {
                             Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
-                            Color = Color.Red,
+                            Color = Color.Orange,
                         }.Build());
                         await arg.DeferAsync();
                     }
@@ -95,7 +95,7 @@ namespace Janitor.Handler
                         await arg.RespondAsync(embed: new EmbedBuilder()
                         {
                             Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
-                            Color = Color.Red,
+                            Color = Color.Orange,
                         }.Build());
                     }
 
@@ -182,7 +182,7 @@ namespace Janitor.Handler
         {
             string text = string.Empty;
             Color col = Color.Red;
-            InformationType result = InformationType.Error;
+            InformationType result = InformationType.Information;
             MessageComponent component = null;
 
             switch (type)
@@ -202,17 +202,20 @@ namespace Janitor.Handler
                     break;
                 case ResponseMessageType.MissingManagerPermission:
                     text = $"ERROR: Missing permission \"Manage Roles\"!";
+                    result = InformationType.Error;
                     break;
                 case ResponseMessageType.MissingRoles:
                     text = $"ERROR: Either the \"{roleFriend}\", the \"{roleJanitor}\" or the \"{roleManager}\" Role is missing!";
+                    result = InformationType.Error;
                     break;
                 case ResponseMessageType.NotAllowed:
                     text = "You are not allowed to do that!";
+                    result = InformationType.Alert;
                     break;
                 case ResponseMessageType.RemoveFriendRole:
                     text = $"{target.Mention} will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
-                    result = InformationType.Information;
                     component = new ComponentBuilder().WithButton($"Remove \"{roleFriend}\" Role", $"rf_{target.Id}", ButtonStyle.Danger).Build();
+                    result = InformationType.Alert;
                     break;
                 case ResponseMessageType.UserDoesntHaveRole:
                     text = $"{target.Mention} doesn't have the Role \"{roleFriend}\"!";
@@ -222,10 +225,28 @@ namespace Janitor.Handler
                     break;
                 case ResponseMessageType.UserHasRoleNow:
                     text = $"\"{roleFriend}\" Role has been granted to {target.Mention} by {user.Mention}.";
-                    col = Color.Green;
                     result = InformationType.Success;
                     break;                
             }
+
+            switch (result)
+            {
+                case InformationType.Alert:
+                    col = Color.Orange;
+                    break;
+                case InformationType.Information:
+                    col = Color.Blue;
+                    break;
+                case InformationType.Success:
+                    col = Color.Green;
+                    break;
+            }
+
+            if (result == InformationType.Information)
+                col = Color.Blue;
+            else if (result == InformationType.Success)
+                col = Color.Green;
+
 
             if (type == ResponseMessageType.UserHasRoleNow) {
                 try // Try to send as message, fallback to ephemeral response in case of missing permissions.
@@ -265,10 +286,18 @@ namespace Janitor.Handler
 
             Color col = Color.Red;
 
-            if (result == InformationType.Success)
-                col = Color.Green;
-            else if (result == InformationType.Information)
-                col = Color.Blue;
+            switch (result)
+            {
+                case InformationType.Alert:
+                    col = Color.Orange;
+                    break;
+                case InformationType.Information:
+                    col = Color.Blue;
+                    break;
+                case InformationType.Success:
+                    col = Color.Green;
+                    break;
+            }
 
             Console.WriteLine($"-> {result}: {type}");
 

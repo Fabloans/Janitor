@@ -2,6 +2,7 @@
 {
     public enum InformationType
     {
+        Alert,
         Information,
         Success,
         Error
