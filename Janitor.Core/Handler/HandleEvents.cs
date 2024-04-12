@@ -210,15 +210,15 @@ namespace Janitor.Handler
                     text = "You are not allowed to do that!";
                     break;
                 case ResponseMessageType.RemoveFriendRole:
-                    text = $"({target.DisplayName}) will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
+                    text = $"{target.Mention} will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
                     result = InformationType.Information;
                     component = new ComponentBuilder().WithButton($"Remove \"{roleFriend}\" Role", $"rf_{target.Id}", ButtonStyle.Danger).Build();
                     break;
                 case ResponseMessageType.UserDoesntHaveRole:
-                    text = $"({target.DisplayName}) doesn't have the Role \"{roleFriend}\"!";
+                    text = $"{target.Mention} doesn't have the Role \"{roleFriend}\"!";
                     break;
                 case ResponseMessageType.UserHasRoleAlready:
-                    text = $"({target.DisplayName}) already got the Role \"{roleFriend}\"!";
+                    text = $"{target.Mention} already got the Role \"{roleFriend}\"!";
                     break;
                 case ResponseMessageType.UserHasRoleNow:
                     text = $"\"{roleFriend}\" Role has been granted to {target.Mention} by {user.Mention}.";
