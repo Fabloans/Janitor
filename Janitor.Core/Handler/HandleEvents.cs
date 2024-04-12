@@ -103,6 +103,8 @@ namespace Janitor.Handler
 
         private async Task Client_UserCommandExecuted(SocketUserCommand arg)
         {
+            await arg.DeferAsync(ephemeral: true);
+
             var command = arg.CommandName;
             var target = arg.Data.Member as SocketGuildUser;
             var user = arg.User as SocketGuildUser;
@@ -213,13 +215,29 @@ namespace Janitor.Handler
                     break;                
             }
 
-            await msg.RespondAsync(embed: new EmbedBuilder()
+            if (type == ResponseMessageType.UserHasRoleNow) {
+                await msg.DeleteOriginalResponseAsync();
+                try
+                {
+                    await msg.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    {
+                        Description = text,
+                        Color = col,
+                    }.Build());
+                }
+                catch
+                {
+                }
+            }
+            else
             {
-                Description = text,
-                Color = col,
-            }.Build(),
-            components: component,
-            ephemeral: type == ResponseMessageType.UserHasRoleNow ? false : true);
+                await msg.FollowupAsync(embed: new EmbedBuilder()
+                {
+                    Description = text,
+                    Color = col,
+                }.Build(),
+                components: component);
+            }
 
             LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{msg.CommandName}\" for {target.Mention}", type, result);
         }
@@ -237,7 +255,7 @@ namespace Janitor.Handler
 
             Console.WriteLine($"-> {result}: {type}");
 
-            if (channel != null) //If channel doesn't exist or we don't have permission, just ignore.
+            if (channel != null) // If channel doesn't exist or we don't have permission, just ignore.
                 try
                 {
                     await channel.SendMessageAsync(embed: new EmbedBuilder()
