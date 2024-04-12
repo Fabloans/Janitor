@@ -7,12 +7,12 @@
         CantEditYourself,
         FriendRoleRemoved,
         JanitorCantHaveRole,
-        MissingPermission,
+        MissingManagerPermission,
         MissingRoles,
         UserDoesntHaveRole,
         UserHasRoleAlready,
         UserHasRoleNow,
         NotAllowed,
-        RemoveFriendRole,
+        RemoveFriendRole
     }
 }

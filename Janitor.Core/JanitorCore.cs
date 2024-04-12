@@ -16,9 +16,9 @@ namespace Janitor
         public JanitorCore()
         {
             var _builder = new ConfigurationBuilder()
-                    .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile(path: "config.json")
-                    .AddEnvironmentVariables();
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile(path: "config.json")
+                .AddEnvironmentVariables();
 
             _config = _builder.Build();
         }
@@ -36,11 +36,11 @@ namespace Janitor
                 client.Ready += ReadyAsync;
 
 #if DEBUG
-                    await client.LoginAsync(TokenType.Bot,
-                        _config["TestToken"]);
+                await client.LoginAsync(TokenType.Bot,
+                    _config["TestToken"]);
 #else
-                    await client.LoginAsync(TokenType.Bot,
-                        _config["Token"]);
+                await client.LoginAsync(TokenType.Bot,
+                    _config["Token"]);
 #endif
 
                 await client.StartAsync();
@@ -67,15 +67,15 @@ namespace Janitor
         private ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
-                    .AddSingleton(_config)
-                    .AddSingleton(x => new DiscordSocketClient(new DiscordSocketConfig()
-                    {
-                        GatewayIntents = GatewayIntents.All
-                    }))
-                    .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-                    .AddSingleton(x => new HandleEvents(x.GetRequiredService<DiscordSocketClient>()))
-                    .AddSingleton<HandleEvents>()
-                    .BuildServiceProvider();
+                .AddSingleton(_config)
+                .AddSingleton(x => new DiscordSocketClient(new DiscordSocketConfig()
+                {
+                    GatewayIntents = GatewayIntents.All
+                }))
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+                .AddSingleton(x => new HandleEvents(x.GetRequiredService<DiscordSocketClient>()))
+                .AddSingleton<HandleEvents>()
+                .BuildServiceProvider();
         }
 
     }
