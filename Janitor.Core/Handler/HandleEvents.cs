@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.4";
+        const string BotVersion = "1.0.1.5";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -21,7 +21,7 @@ namespace Janitor.Handler
         const string removeRoleCmd = $"Remove {roleFriend} Role";
         const string modChannelName = "mod-log";
 
-        //A simple list of some Janitor related sayings
+        // A simple list of some Janitor related sayings
         List<string> status = new List<string>()
         {
             "I'm a Janitor. What is your superpower?",
@@ -39,7 +39,7 @@ namespace Janitor.Handler
 
         public HandleEvents(DiscordSocketClient client)
         {
-            //Register new Events
+            // Register new Events
             client.Ready += Client_Ready;
 
             client.JoinedGuild += Client_JoinedGuild;
@@ -57,9 +57,9 @@ namespace Janitor.Handler
             var uid = arg.Data.CustomId.ToString().Split('_')[1];
             var target = guild.GetUser(Convert.ToUInt64(uid));
             var user = guild.GetUser(arg.User.Id);
-            var role = await GetOrCreateRole(guild, roleFriend);
+            var friendRole = await GetOrCreateRole(guild, roleFriend);
 
-            if (target.Roles.Contains(role))
+            if (target.Roles.Contains(friendRole))
             {
                 bool success = false;
                 try
@@ -76,16 +76,28 @@ namespace Janitor.Handler
                     }.Build(),
                     ephemeral: true);
                     
-                    LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.MissingPermission, InformationType.Error);
+                    LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.MissingManagerPermission, InformationType.Error);
                 }
 
                 if (success)
                 {
-                    await arg.RespondAsync(embed: new EmbedBuilder()
+                    try // Try to send as message, fallback to response in case of missing permissions.
                     {
-                        Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
-                        Color = Color.Red,
-                    }.Build());
+                        await arg.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        {
+                            Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
+                            Color = Color.Red,
+                        }.Build());
+                        await arg.DeferAsync();
+                    }
+                    catch
+                    {
+                        await arg.RespondAsync(embed: new EmbedBuilder()
+                        {
+                            Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
+                            Color = Color.Red,
+                        }.Build());
+                    }
 
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
                 }            
@@ -94,7 +106,7 @@ namespace Janitor.Handler
 
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
-            //If Client is ready, create Roles if they don't not exist
+            // If Client is ready, create Roles if they don't not exist
             await GetOrCreateRole(arg, roleFriend);
             await GetOrCreateRole(arg, roleJanitor);
             await GetOrCreateRole(arg, roleManager);
@@ -142,7 +154,7 @@ namespace Janitor.Handler
                         }
                         catch
                         {
-                            await SendInfo(arg, ResponseMessageType.MissingPermission, target, user);
+                            await SendInfo(arg, ResponseMessageType.MissingManagerPermission, target, user);
                         }
                         
                         if (success)
@@ -188,7 +200,7 @@ namespace Janitor.Handler
                 case ResponseMessageType.JanitorCantHaveRole:
                     text = $"A {roleJanitor} can't have the Role \"{roleFriend}\"! They're cool enough already!";
                     break;
-                case ResponseMessageType.MissingPermission:
+                case ResponseMessageType.MissingManagerPermission:
                     text = $"ERROR: Missing permission \"Manage Roles\"!";
                     break;
                 case ResponseMessageType.MissingRoles:
@@ -216,17 +228,22 @@ namespace Janitor.Handler
             }
 
             if (type == ResponseMessageType.UserHasRoleNow) {
-                await msg.DeleteOriginalResponseAsync();
-                try
+                try // Try to send as message, fallback to ephemeral response in case of missing permissions.
                 {
                     await msg.Channel.SendMessageAsync(embed: new EmbedBuilder()
                     {
                         Description = text,
                         Color = col,
                     }.Build());
+                    await msg.DeleteOriginalResponseAsync();
                 }
                 catch
                 {
+                    await msg.FollowupAsync(embed: new EmbedBuilder()
+                    {
+                        Description = text,
+                        Color = col,
+                    }.Build());
                 }
             }
             else
