@@ -54,6 +54,12 @@ namespace Janitor.Handler
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
             LogMessage(arg.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotJoined, InformationType.Information);
+
+            // Create essential roles when joining guild.
+            await GetOrCreateRole(arg, roleFriend);
+            await GetOrCreateRole(arg, roleManager);
+
+            AddUserCommand(arg);
         }
 
         private async Task Client_Ready()
@@ -64,11 +70,12 @@ namespace Janitor.Handler
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
                 LogMessage(guild.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotStarted, InformationType.Information);
-                AddUserCommand(guild);
-
+                
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
                 await GetOrCreateRole(guild, roleManager);
+
+                AddUserCommand(guild);
             }
 
             SetStatus();
