@@ -14,4 +14,10 @@ Setting up the Janitor - Discord Bot:
 
 - After that you can run the Bot. Have fun.
 
-Restart the bot at https://f15c17a071d74ff5a45d18a3f3b0c597.eyomid.com
+When adding the bot to your server, it will create the essential roles "Role Manager" and "Friend".
+There is an optional role "Janitor" you can create manually.
+
+The "Role Manager" role has permission to assign or remove the "Friend" role.
+The "Janitor" role has permission to only assign the "Friend" role. The "Janitor" and the "Friend" role are mutually exclusive.
+
+Optionally, you can also create the channel "#mod-log" where the bot will log its activity.
