@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.10";
+        const string BotVersion = "1.0.1.11";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -301,6 +301,9 @@ namespace Janitor.Handler
 
         private async Task Client_ButtonExecuted(SocketMessageComponent arg)
         {
+            await arg.DeferAsync();
+            await arg.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().Build()); // Remove Button on click
+
             var id = (ulong)arg.GuildId;
             var guild = _client.GetGuild(id);
 
@@ -319,34 +322,33 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    await arg.RespondAsync(embed: new EmbedBuilder()
+                    await arg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
                     {
                         Description = $"ERROR: Janitor Bot is missing permission \"Manage Roles\"!",
                         Color = Color.Red,
-                    }.Build(),
-                    ephemeral: true);
+                    }.Build());
 
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.MissingManagerPermission, InformationType.Error);
                 }
 
                 if (success)
                 {
-                    try // Try to send as message, fallback to response in case of missing permissions.
+                    try // Try to send as message, fallback to ephemeral response in case of missing permissions.
                     {
                         await arg.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         {
                             Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
                             Color = Color.Orange,
                         }.Build());
-                        await arg.DeferAsync();
+                        await arg.DeleteOriginalResponseAsync();
                     }
                     catch
                     {
-                        await arg.RespondAsync(embed: new EmbedBuilder()
+                        await arg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
                         {
                             Description = $"\"{roleFriend}\" Role has been removed from {target.Mention} by {user.Mention}.",
                             Color = Color.Orange,
-                        }.Build());
+                        }.Build());                       
                     }
 
                     LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{removeRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
