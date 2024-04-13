@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.7";
+        const string BotVersion = "1.0.1.8";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -106,10 +106,9 @@ namespace Janitor.Handler
 
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
-            // If Client is ready, create Roles if they don't not exist
+            // If Client is added to server, create essential Roles if they don't not exist
             await GetOrCreateRole(arg, roleFriend);
             await GetOrCreateRole(arg, roleManager);
-            AddUserCommand(arg);
         }
 
         private async Task Client_UserCommandExecuted(SocketUserCommand arg)
@@ -188,7 +187,7 @@ namespace Janitor.Handler
             {
                 case ResponseMessageType.BotCantHaveRole:
                     if (target.DisplayName == _client.CurrentUser.Username)
-                        text = $"As much as I love you, I can't be your friend. :(";
+                        text = $"As much as I love you, I can't be your friend. :cry:";
                     else
                         text = $"A bot can't have the Role \"{roleFriend}\"!";
                     break;
@@ -212,7 +211,7 @@ namespace Janitor.Handler
                     result = InformationType.Alert;
                     break;
                 case ResponseMessageType.RemoveFriendRole:
-                    text = $"{target.Mention} will lose all access to private sections!\r\nDo you REALLY wish to remove the \"{roleFriend}\" Role?";
+                    text = $"{target.Mention} will lose all access to private sections!\r\nDo you **REALLY** wish to remove the \"{roleFriend}\" Role?";
                     component = new ComponentBuilder().WithButton($"Remove \"{roleFriend}\" Role", $"rf_{target.Id}", ButtonStyle.Danger).Build();
                     result = InformationType.Alert;
                     break;
@@ -220,7 +219,7 @@ namespace Janitor.Handler
                     text = $"{target.Mention} doesn't have the Role \"{roleFriend}\"!";
                     break;
                 case ResponseMessageType.UserHasRoleAlready:
-                    text = $"{target.Mention} already got the Role \"{roleFriend}\"!";
+                    text = $"{target.Mention} already has the Role \"{roleFriend}\"!";
                     break;
                 case ResponseMessageType.UserHasRoleNow:
                     text = $"\"{roleFriend}\" Role has been granted to {target.Mention} by {user.Mention}.";
@@ -240,12 +239,6 @@ namespace Janitor.Handler
                     col = Color.Green;
                     break;
             }
-
-            if (result == InformationType.Information)
-                col = Color.Blue;
-            else if (result == InformationType.Success)
-                col = Color.Green;
-
 
             if (type == ResponseMessageType.UserHasRoleNow) {
                 try // Try to send as message, fallback to ephemeral response in case of missing permissions.
@@ -360,7 +353,7 @@ namespace Janitor.Handler
                 });
 
             }
-            catch (ApplicationCommandException exception)
+            catch (HttpException exception)
             {
                 var json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
                 Console.WriteLine(json);
