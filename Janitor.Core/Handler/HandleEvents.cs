@@ -68,8 +68,8 @@ namespace Janitor.Handler
 
             foreach (var guild in guilds)
             {
-                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
-                LogMessage(guild.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotStarted, InformationType.Information);
+                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion}.");
+                LogMessage(guild.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotReady, InformationType.Information);
                 
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
@@ -86,15 +86,19 @@ namespace Janitor.Handler
             IRole resRole = guild.Roles.Where(x => x.Name == role).FirstOrDefault();
 
             if (resRole == null)
+            {
+                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Create missing Role \"{role}\".");
+
                 try
                 {
                     resRole = await guild.CreateRoleAsync(role);
-                    Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Created Role \"{role}\".");
+                    LogMessage(guild.Name, $"Creating missing Role \"{role}\".", ResponseMessageType.CreateRole, InformationType.Success);
                 }
-                catch 
+                catch
                 {
-                    Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: ERROR: Failed to create Role \"{role}\"! Missing \"Role Manager\" permission!");
+                    LogMessage(guild.Name, $"Creating missing Role \"{role}\".", ResponseMessageType.MissingManagerPermission, InformationType.Error);
                 }
+            }
 
             return resRole;
         }
@@ -171,19 +175,15 @@ namespace Janitor.Handler
                         await SendInfo(arg, ResponseMessageType.JanitorCantHaveRole, target, user);
                     else
                     {
-                        bool success = false;
                         try
                         {                          
                             await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
-                            success = true;
+                            await SendInfo(arg, ResponseMessageType.UserHasRoleNow, target, user);
                         }
                         catch
                         {
                             await SendInfo(arg, ResponseMessageType.MissingManagerPermission, target, user);
                         }
-                        
-                        if (success)
-                            await SendInfo(arg, ResponseMessageType.UserHasRoleNow, target, user);
                     }
                 }
                 else

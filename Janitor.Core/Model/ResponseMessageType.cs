@@ -4,7 +4,8 @@
     {
         BotCantHaveRole,
         BotJoined,
-        BotStarted,
+        BotReady,
+        CreateRole,
         CantEditYourself,
         FriendRoleRemoved,
         JanitorCantHaveRole,
