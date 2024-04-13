@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.1.6";
+        const string BotVersion = "1.0.1.7";
         const string roleFriend = "Friend";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
@@ -71,7 +71,7 @@ namespace Janitor.Handler
                 {
                     await arg.RespondAsync(embed: new EmbedBuilder()
                     {
-                        Description = $"ERROR: Missing permission \"Manage Roles\"!",
+                        Description = $"ERROR: Janitor Bot is missing permission \"Manage Roles\"!",
                         Color = Color.Red,
                     }.Build(),
                     ephemeral: true);
@@ -108,7 +108,6 @@ namespace Janitor.Handler
         {
             // If Client is ready, create Roles if they don't not exist
             await GetOrCreateRole(arg, roleFriend);
-            await GetOrCreateRole(arg, roleJanitor);
             await GetOrCreateRole(arg, roleManager);
             AddUserCommand(arg);
         }
@@ -128,7 +127,7 @@ namespace Janitor.Handler
 
             Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"{command}\" for {target.DisplayName}");
 
-            if (FriendRole == null || JanitorRole == null || ManagerRole == null)
+            if (FriendRole == null || ManagerRole == null)
             {
                 await SendInfo(arg, ResponseMessageType.MissingRoles, target, user);
             }
@@ -201,11 +200,11 @@ namespace Janitor.Handler
                     text = $"A {roleJanitor} can't have the Role \"{roleFriend}\"! They're cool enough already!";
                     break;
                 case ResponseMessageType.MissingManagerPermission:
-                    text = $"ERROR: Missing permission \"Manage Roles\"!";
+                    text = $"ERROR: Janitor Bot is missing permission \"Manage Roles\"!";
                     result = InformationType.Error;
                     break;
                 case ResponseMessageType.MissingRoles:
-                    text = $"ERROR: Either the \"{roleFriend}\", the \"{roleJanitor}\" or the \"{roleManager}\" Role is missing!";
+                    text = $"ERROR: Either the \"{roleFriend}\" or the \"{roleManager}\" Role is missing!";
                     result = InformationType.Error;
                     break;
                 case ResponseMessageType.NotAllowed:
