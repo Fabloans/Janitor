@@ -20,4 +20,6 @@ There is an optional role "Janitor" you can create manually.
 The "Role Manager" role has permission to assign or remove the "Friend" role.
 The "Janitor" role has permission to only assign the "Friend" role. The "Janitor" and the "Friend" role are mutually exclusive.
 
+In case you don't want the role assignment/revokation messages to be public, simply remove the bot's "Send messages" role.
+
 Optionally, you can also create the channel "#mod-log" where the bot will log its activity.
