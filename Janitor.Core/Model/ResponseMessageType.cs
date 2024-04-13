@@ -3,6 +3,7 @@
     public enum ResponseMessageType
     {
         BotCantHaveRole,
+        BotJoined,
         BotStarted,
         CantEditYourself,
         FriendRoleRemoved,
