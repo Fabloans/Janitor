@@ -53,7 +53,7 @@ namespace Janitor.Handler
 
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
-            LogMessage(arg.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotJoined, InformationType.Information);
+            LogMessage(arg.Name, $"Janitor Bot v{BotVersion} joined.", ResponseMessageType.BotJoined, InformationType.Information);
 
             // Create essential roles when joining guild.
             await GetOrCreateRole(arg, roleFriend);
@@ -68,8 +68,8 @@ namespace Janitor.Handler
 
             foreach (var guild in guilds)
             {
-                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion}.");
-                LogMessage(guild.Name, $"Janitor Bot v{BotVersion}.", ResponseMessageType.BotReady, InformationType.Information);
+                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
+                LogMessage(guild.Name, $"Janitor Bot v{BotVersion} ready.", ResponseMessageType.BotReady, InformationType.Information);
                 
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
@@ -213,7 +213,7 @@ namespace Janitor.Handler
             switch (type)
             {
                 case ResponseMessageType.BotCantHaveRole:
-                    if (target.DisplayName == _client.CurrentUser.Username)
+                    if (target.Username == _client.CurrentUser.Username)
                         text = $"As much as I love you, I can't be your friend. :cry:";
                     else
                         text = $"A bot can't have the Role \"{roleFriend}\"!";
