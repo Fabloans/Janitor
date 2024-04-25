@@ -11,10 +11,11 @@
         JanitorCantHaveRole,
         MissingManagerPermission,
         MissingRoles,
-        UserDoesntHaveRole,
-        UserHasRoleAlready,
-        UserHasRoleNow,
+        UserDoesntHaveFriendRole,
+        UserHasFriendRoleAlready,
+        UserHasFriendRoleNow,
         NotAllowed,
-        RemoveFriendRole
+        RemoveFriendRole,
+        RemoveGuestRole
     }
 }
