@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.1";
+        const string BotVersion = "1.0.2.2";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -131,7 +131,7 @@ namespace Janitor.Handler
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            var guild = _client.GetGuild((ulong)user.Guild.Id);
+            var guild = _client.GetGuild(user.Guild.Id);
             var GuestRole = guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault();
 
             if (GuestRole != null)
@@ -230,7 +230,6 @@ namespace Janitor.Handler
                     await SendInfo(cmd, ResponseMessageType.NotAllowed, target, user);
             }
         }
-
         private async Task SendInfo(SocketUserCommand cmd, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user, SocketRole GuestRole = null)
         {
             string text = string.Empty;
@@ -334,8 +333,8 @@ namespace Janitor.Handler
             await msg.DeferAsync(); // Needed for .Modify[...]() and .Delete[...]() to work.
             await msg.ModifyOriginalResponseAsync(resp => resp.Components = new ComponentBuilder().Build()); // Remove Button on click
 
-            var id = (ulong)msg.GuildId;
-            var guild = _client.GetGuild(id);
+            var id = msg.GuildId;
+            var guild = _client.GetGuild((ulong)id);
 
             var uid = msg.Data.CustomId.ToString().Split('_')[1];
             var target = guild.GetUser(Convert.ToUInt64(uid));
