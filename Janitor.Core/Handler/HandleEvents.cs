@@ -46,6 +46,7 @@ namespace Janitor.Handler
             // Register new Events
             client.Ready += Client_Ready;
             client.JoinedGuild += Client_JoinedGuild;
+            client.UserJoined += Client_UserJoined;
             client.UserCommandExecuted += Client_UserCommandExecuted;
             client.ButtonExecuted += Client_ButtonExecuted;
 
@@ -128,6 +129,25 @@ namespace Janitor.Handler
             }
         }
 
+        private async Task Client_UserJoined(SocketGuildUser user)
+        {
+            var guild = _client.GetGuild((ulong)user.Guild.Id);
+            var GuestRole = guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault();
+
+            if (GuestRole != null)
+            {
+                try
+                {
+                    await user.AddRoleAsync(GuestRole);
+                    LogMessage(guild.Name, $"\"{GuestRole}\" role granted to {user.Mention}.", ResponseMessageType.AddGuestRole, InformationType.Success);
+                }
+                catch
+                {
+                    LogMessage(guild.Name, $": \"{GuestRole}\".", ResponseMessageType.MissingManagerPermission, InformationType.ERROR);
+                }
+            }
+        }
+
         private async void SetStatus()
         {
             var StatusThread = new Thread(x =>
@@ -169,7 +189,7 @@ namespace Janitor.Handler
             {
                 if (user.Roles.Contains(ManagerRole) || user.Roles.Contains(JanitorRole))
                 {
-                    if (target.Roles.Where(x => x.Name == roleFriend).Count() == 1)
+                    if (target.Roles.Contains(FriendRole))
                         await SendInfo(cmd, ResponseMessageType.UserHasFriendRoleAlready, target, user);
                     else if (target.IsBot)
                         await SendInfo(cmd, ResponseMessageType.BotCantHaveRole, target, user);
@@ -179,10 +199,14 @@ namespace Janitor.Handler
                     {
                         try
                         {
-                            await target.AddRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
-                            if (target.Roles.Where(x => x.Name == roleGuest).Count() == 1)
-                                await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault());
-                            await SendInfo(cmd, ResponseMessageType.UserHasFriendRoleNow, target, user);
+                            await target.AddRoleAsync(FriendRole);
+                            if (target.Roles.Contains(GuestRole))
+                            {
+                                await target.RemoveRoleAsync(GuestRole);
+                                await SendInfo(cmd, ResponseMessageType.UserHasFriendRoleNow, target, user, GuestRole);
+                            }
+                            else   
+                                await SendInfo(cmd, ResponseMessageType.UserHasFriendRoleNow, target, user);
                         }
                         catch
                         {
@@ -197,7 +221,7 @@ namespace Janitor.Handler
             {
                 if (user.Roles.Contains(ManagerRole))
                 {
-                    if (target.Roles.Where(x => x.Name == roleFriend).Count() == 0)
+                    if (!target.Roles.Contains(FriendRole))
                         await SendInfo(cmd, ResponseMessageType.UserDoesntHaveFriendRole, target, user);
                     else
                         await SendInfo(cmd, ResponseMessageType.RemoveFriendRole, target, user);
@@ -207,7 +231,7 @@ namespace Janitor.Handler
             }
         }
 
-        private async Task SendInfo(SocketUserCommand cmd, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user)
+        private async Task SendInfo(SocketUserCommand cmd, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user, SocketRole GuestRole = null)
         {
             string text = string.Empty;
             Color col = Color.Red;
@@ -254,6 +278,8 @@ namespace Janitor.Handler
                     break;
                 case ResponseMessageType.UserHasFriendRoleNow:
                     text = $"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.";
+                    if (GuestRole != null)
+                        text += $"\r\n\"{roleGuest}\" role has been removed.";
                     result = InformationType.Success;
                     break;                
             }
@@ -303,30 +329,33 @@ namespace Janitor.Handler
             LogMessage(user.Guild.Name, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", type, result);
         }
 
-        private async Task Client_ButtonExecuted(SocketMessageComponent arg)
+        private async Task Client_ButtonExecuted(SocketMessageComponent msg)
         {
-            await arg.DeferAsync(); // Needed for .Modify[...]() and .Delete[...]() to work.
-            await arg.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().Build()); // Remove Button on click
+            await msg.DeferAsync(); // Needed for .Modify[...]() and .Delete[...]() to work.
+            await msg.ModifyOriginalResponseAsync(resp => resp.Components = new ComponentBuilder().Build()); // Remove Button on click
 
-            var id = (ulong)arg.GuildId;
+            var id = (ulong)msg.GuildId;
             var guild = _client.GetGuild(id);
 
-            var uid = arg.Data.CustomId.ToString().Split('_')[1];
+            var uid = msg.Data.CustomId.ToString().Split('_')[1];
             var target = guild.GetUser(Convert.ToUInt64(uid));
-            var user = guild.GetUser(arg.User.Id);
-            var friendRole = await GetOrCreateRole(guild, roleFriend);
+            var user = guild.GetUser(msg.User.Id);
+            var FriendRole = guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault();
+            var GuestRole = guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault();
 
-            if (target.Roles.Contains(friendRole))
+            if (target.Roles.Contains(FriendRole))
             {
                 bool success = false;
                 try
                 {
-                    await target.RemoveRoleAsync(guild.Roles.Where(x => x.Name == roleFriend).FirstOrDefault());
+                    await target.RemoveRoleAsync(FriendRole);
+                    if (GuestRole != null)
+                        await target.AddRoleAsync(GuestRole);
                     success = true;
                 }
                 catch
                 {
-                    await arg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
+                    await msg.ModifyOriginalResponseAsync(resp => resp.Embed = new EmbedBuilder()
                     {
                         Description = $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!",
                         Color = Color.Red,
@@ -337,20 +366,25 @@ namespace Janitor.Handler
 
                 if (success)
                 {
+                    string text = $"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.";
+
+                    if (GuestRole != null)
+                        text += $"\r\n\"{roleGuest}\" role has been granted.";
+
                     try // Try to send as message, fallback to ephemeral response in case of missing permissions.
                     {
-                        await arg.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        await msg.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         {
-                            Description = $"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.",
+                            Description = text,
                             Color = Color.Orange,
                         }.Build());
-                        await arg.DeleteOriginalResponseAsync();
+                        await msg.DeleteOriginalResponseAsync();
                     }
                     catch
                     {
-                        await arg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
+                        await msg.ModifyOriginalResponseAsync(resp => resp.Embed = new EmbedBuilder()
                         {
-                            Description = $"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.",
+                            Description = text,
                             Color = Color.Orange,
                         }.Build());                       
                     }
