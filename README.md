@@ -19,6 +19,7 @@ There is an optional role "Janitor" you can create manually.
 
 The "Role Manager" role has permission to assign or remove the "Friend" role.
 The "Janitor" role has permission to only assign the "Friend" role. The "Janitor" and the "Friend" role are mutually exclusive.
+The "Guest" role is optional. If it exists it will be assigned to users on join, and removed when assigning the "Friend" role (and vice verca).
 
 In case you don't want the role assignment/revokation messages to be public, simply remove the bot's "Send messages" role.
 
