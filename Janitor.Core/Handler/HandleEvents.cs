@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.2";
+        const string BotVersion = "1.0.2.3";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -139,6 +139,7 @@ namespace Janitor.Handler
                 try
                 {
                     await user.AddRoleAsync(GuestRole);
+                    Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} joined. Assigning \"{GuestRole}\" to {user.DisplayName}");
                     LogMessage(guild.Name, $"\"{GuestRole}\" role granted to {user.Mention}.", ResponseMessageType.AddGuestRole, InformationType.Success);
                 }
                 catch
