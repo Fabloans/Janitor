@@ -2,20 +2,21 @@
 {
     public enum ResponseMessageType
     {
+        AddFriendRole,
         AddGuestRole,
         BotCantHaveRole,
         BotJoined,
         BotReady,
         CreateRole,
         CantEditYourself,
-        FriendRoleRemoved,
         JanitorCantHaveRole,
         MissingManagerPermission,
         MissingRoles,
+        MissingUserPermission,
+        RemoveFriendRole,
+        RemoveGuestRole,
         UserDoesntHaveFriendRole,
         UserHasFriendRoleAlready,
-        UserHasFriendRoleNow,
-        NotAllowed,
-        RemoveFriendRole
+        Null
     }
 }

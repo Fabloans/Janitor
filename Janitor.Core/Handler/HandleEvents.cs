@@ -55,7 +55,7 @@ namespace Janitor.Handler
 
         private async Task Client_JoinedGuild(SocketGuild guild)
         {
-            LogMessage(guild.Id, $"Janitor Bot v{BotVersion} joined.", ResponseMessageType.BotJoined, InformationType.Information);
+            LogMessage(guild.Id, $"Janitor Bot v{BotVersion} joined.", InformationType.Information, ResponseMessageType.BotJoined);
 
             // Create essential roles when joining guild.
             await GetOrCreateRole(guild, roleFriend);
@@ -71,7 +71,7 @@ namespace Janitor.Handler
             foreach (var guild in guilds)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
-                LogMessage(guild.Id, $"Janitor Bot v{BotVersion} ready.", ResponseMessageType.BotReady, InformationType.Information);
+                LogMessage(guild.Id, $"Janitor Bot v{BotVersion} ready.", InformationType.Information, ResponseMessageType.BotReady);
                 
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
@@ -94,11 +94,11 @@ namespace Janitor.Handler
                 try
                 {
                     createRole = await guild.CreateRoleAsync(role);
-                    LogMessage(guild.Id, $"Creating missing role: \"{role}\".", ResponseMessageType.CreateRole, InformationType.Success);
+                    LogMessage(guild.Id, $"Creating missing role: \"{role}\".", InformationType.Success, ResponseMessageType.CreateRole);
                 }
                 catch
                 {
-                    LogMessage(guild.Id, $"Creating missing role: \"{role}\".", ResponseMessageType.MissingManagerPermission, InformationType.ERROR);
+                    LogMessage(guild.Id, $"Creating missing role: \"{role}\".", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
                 }
             }
 
@@ -141,11 +141,11 @@ namespace Janitor.Handler
                 try
                 {
                     await user.AddRoleAsync(GuestRole);
-                    LogMessage(guild.Id, $"\"{GuestRole}\" role granted to {user.Mention}.", ResponseMessageType.AddGuestRole, InformationType.Success);
+                    LogMessage(guild.Id, $"\"{GuestRole}\" role granted to {user.Mention}.", InformationType.Success, ResponseMessageType.AddGuestRole);
                 }
                 catch
                 {
-                    LogMessage(guild.Id, $": \"{GuestRole}\".", ResponseMessageType.MissingManagerPermission, InformationType.ERROR);
+                    LogMessage(guild.Id, $": \"{GuestRole}\".", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
                 }
             }
         }
@@ -205,10 +205,10 @@ namespace Janitor.Handler
                             if (target.Roles.Contains(GuestRole))
                             {
                                 await target.RemoveRoleAsync(GuestRole);
-                                await SendInfo(cmd, ResponseMessageType.UserHasFriendRoleNow, target, user, GuestRole);
+                                await SendInfo(cmd, ResponseMessageType.AddFriendRole, target, user, GuestRole);
                             }
                             else   
-                                await SendInfo(cmd, ResponseMessageType.UserHasFriendRoleNow, target, user);
+                                await SendInfo(cmd, ResponseMessageType.AddFriendRole, target, user);
                         }
                         catch
                         {
@@ -217,7 +217,7 @@ namespace Janitor.Handler
                     }
                 }
                 else
-                    await SendInfo(cmd, ResponseMessageType.NotAllowed, target, user);
+                    await SendInfo(cmd, ResponseMessageType.MissingUserPermission, target, user);
             }
             else if (command == removeFriendRoleCmd)
             {
@@ -229,7 +229,7 @@ namespace Janitor.Handler
                         await SendInfo(cmd, ResponseMessageType.RemoveFriendRole, target, user);
                 }
                 else
-                    await SendInfo(cmd, ResponseMessageType.NotAllowed, target, user);
+                    await SendInfo(cmd, ResponseMessageType.MissingUserPermission, target, user);
             }
         }
         private async Task SendInfo(SocketUserCommand cmd, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user, SocketRole GuestRole = null)
@@ -262,7 +262,7 @@ namespace Janitor.Handler
                     text = $"ERROR: Either the \"{roleFriend}\" or the \"{roleManager}\" role is missing!";
                     result = InformationType.ERROR;
                     break;
-                case ResponseMessageType.NotAllowed:
+                case ResponseMessageType.MissingUserPermission:
                     text = "You are not allowed to do that!";
                     result = InformationType.Alert;
                     break;
@@ -277,7 +277,7 @@ namespace Janitor.Handler
                 case ResponseMessageType.UserHasFriendRoleAlready:
                     text = $"{target.Mention} already has the \"{roleFriend}\" role!";
                     break;
-                case ResponseMessageType.UserHasFriendRoleNow:
+                case ResponseMessageType.AddFriendRole:
                     text = $"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.";
                     if (GuestRole != null)
                         text += $"\r\n\"{roleGuest}\" role has been removed.";
@@ -298,7 +298,7 @@ namespace Janitor.Handler
                     break;
             }
 
-            if (type == ResponseMessageType.UserHasFriendRoleNow) {
+            if (type == ResponseMessageType.AddFriendRole) {
                 try // Try to send as message, fallback to ephemeral response in case of missing permissions.
                 {
                     await cmd.Channel.SendMessageAsync(embed: new EmbedBuilder()
@@ -327,7 +327,10 @@ namespace Janitor.Handler
                 components: component);
             }
 
-            LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", type, result);
+            if (type == ResponseMessageType.AddFriendRole && GuestRole != null)
+                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", result, type, ResponseMessageType.RemoveGuestRole);
+            else
+                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", result, type);
         }
 
         private async Task Client_ButtonExecuted(SocketMessageComponent msg)
@@ -360,7 +363,7 @@ namespace Janitor.Handler
                         Color = Color.Red,
                     }.Build());
 
-                    LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", ResponseMessageType.MissingManagerPermission, InformationType.ERROR);
+                    LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
                 }
 
                 if (success)
@@ -388,18 +391,23 @@ namespace Janitor.Handler
                         }.Build());                       
                     }
 
-                    LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", ResponseMessageType.FriendRoleRemoved, InformationType.Success);
+                    if (GuestRole != null)
+                        LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.Success, ResponseMessageType.RemoveFriendRole, ResponseMessageType.AddGuestRole);
+                    else
+                        LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.Success, ResponseMessageType.RemoveFriendRole);
                 }
             }
         }
 
-        private async void LogMessage(ulong server, string message, ResponseMessageType type, InformationType result = InformationType.Information)
+        private async void LogMessage(ulong server, string message, InformationType result, ResponseMessageType type, ResponseMessageType type2 = ResponseMessageType.Null)
         {
             SocketTextChannel channel = (SocketTextChannel)_client.GetGuild(server).Channels.FirstOrDefault(x => x.Name == modChannelName);
 
             Color col = Color.Red;
 
             Console.WriteLine($"-> {result}: {type}");
+            if (type2 != ResponseMessageType.Null)
+                Console.WriteLine($"-> {result}: {type2}");
 
             switch (result)
             {
@@ -415,17 +423,23 @@ namespace Janitor.Handler
             }
 
             if (channel != null) // If channel doesn't exist or we don't have permission, just ignore.
+            {
+                string text = $"{message}\r\n-> {result}: {type}";
+                if (type2 != ResponseMessageType.Null)
+                    text += $"\r\n -> {result}: {type2}";
+
                 try
                 {
                     await channel.SendMessageAsync(embed: new EmbedBuilder()
                     {
-                        Description = $"{message}\r\n-> {result}: {type}",
+                        Description = text,
                         Color = col,
                     }.Build());
                 }
                 catch
                 {
                 }
+            }
         }
     }
 }
