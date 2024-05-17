@@ -96,20 +96,7 @@ namespace Janitor.Handler
                 try
                 {
                     await user.AddRoleAsync(GuestRole);
-                    if (channel != null) // If channel doesn't exist or we don't have permission, just ignore.
-                    {
-                        try
-                        {
-                            await channel.SendMessageAsync(embed: new EmbedBuilder()
-                            {
-                                Description = $"Temporary \"{roleGuest}\" role has been granted to {user.Mention}.",
-                                Color = Color.Orange,
-                            }.Build());
-                        }
-                        catch
-                        {
-                        }
-                    }
+                    await SendMessageToChannel(channel, $"Temporary \"{roleGuest}\" role has been granted to {user.Mention}.", Color.Orange);
                     LogMessage(guild.Id, $"\"{GuestRole}\" role granted to {user.Mention}.", InformationType.Success, ResponseMessageType.AddGuestRole);
                 }
                 catch
@@ -163,6 +150,26 @@ namespace Janitor.Handler
                 var json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
                 Console.WriteLine(json);
             }
+        }
+
+        private async Task<bool> SendMessageToChannel(SocketTextChannel channel, string text, Color col)
+        {
+            if (channel != null) // If channel doesn't exist or we don't have permission, just ignore.
+            {
+                try
+                {
+                    await channel.SendMessageAsync(embed: new EmbedBuilder()
+                    {
+                        Description = text,
+                        Color = col,
+                    }.Build());
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private async void SetStatus()
@@ -247,6 +254,7 @@ namespace Janitor.Handler
                     await SendInfo(cmd, ResponseMessageType.MissingUserPermission, target, user);
             }
         }
+
         private async Task SendInfo(SocketUserCommand cmd, ResponseMessageType type, SocketGuildUser target , SocketGuildUser user, SocketRole GuestRole = null)
         {
             string text = string.Empty;
@@ -314,16 +322,10 @@ namespace Janitor.Handler
             }
 
             if (type == ResponseMessageType.AddFriendRole) {
-                try // Try to send as message, fallback to ephemeral response in case of missing permissions.
-                {
-                    await cmd.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                    {
-                        Description = text,
-                        Color = col,
-                    }.Build());
+                // Try to send as message, fallback to ephemeral response in case of missing permissions.
+                if (await SendMessageToChannel((SocketTextChannel) cmd.Channel, text, col))
                     await cmd.DeleteOriginalResponseAsync();
-                }
-                catch
+                else
                 {
                     await cmd.FollowupAsync(embed: new EmbedBuilder()
                     {
@@ -389,16 +391,10 @@ namespace Janitor.Handler
                     if (GuestRole != null)
                         text += $"\r\n\"{roleGuest}\" role has been granted.";
 
-                    try // Try to send as message, fallback to ephemeral response in case of missing permissions.
-                    {
-                        await msg.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                        {
-                            Description = text,
-                            Color = Color.Orange,
-                        }.Build());
+                    // Try to send as message, fallback to ephemeral response in case of missing permissions.
+                    if (await SendMessageToChannel((SocketTextChannel) msg.Channel, text, Color.Orange))
                         await msg.DeleteOriginalResponseAsync();
-                    }
-                    catch
+                    else
                     {
                         await msg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
                         {
@@ -438,24 +434,11 @@ namespace Janitor.Handler
                     break;
             }
 
-            if (channel != null) // If channel doesn't exist or we don't have permission, just ignore.
-            {
-                string text = $"{message}\r\n-> {result}: {type}";
-                if (type2 != ResponseMessageType.Null)
-                    text += $"\r\n -> {result}: {type2}";
+            string text = $"{message}\r\n-> {result}: {type}";
+            if (type2 != ResponseMessageType.Null)
+                text += $"\r\n -> {result}: {type2}";
 
-                try
-                {
-                    await channel.SendMessageAsync(embed: new EmbedBuilder()
-                    {
-                        Description = text,
-                        Color = col,
-                    }.Build());
-                }
-                catch
-                {
-                }
-            }
+            await SendMessageToChannel(channel, text, col);
         }
     }
 }
