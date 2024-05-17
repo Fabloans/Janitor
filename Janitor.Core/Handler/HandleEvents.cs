@@ -172,6 +172,25 @@ namespace Janitor.Handler
             return true;
         }
 
+        private async Task SendMessageFollowUp(SocketUserCommand cmd, string text, Color col, MessageComponent component = null)
+        {
+            await cmd.FollowupAsync(embed: new EmbedBuilder()
+            {
+                Description = text,
+                Color = col,
+            }.Build(),
+            components: component);
+        }
+
+        private async Task SendMessageModify(SocketMessageComponent msg, string text, Color col)
+        {
+            await msg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
+            {
+                Description = text,
+                Color = col,
+            }.Build());
+        }
+
         private async void SetStatus()
         {
             var StatusThread = new Thread(x =>
@@ -323,26 +342,13 @@ namespace Janitor.Handler
 
             if (type == ResponseMessageType.AddFriendRole) {
                 // Try to send as message, fallback to ephemeral response in case of missing permissions.
-                if (await SendMessageToChannel((SocketTextChannel) cmd.Channel, text, col))
+                if (await SendMessageToChannel((SocketTextChannel)cmd.Channel, text, col))
                     await cmd.DeleteOriginalResponseAsync();
                 else
-                {
-                    await cmd.FollowupAsync(embed: new EmbedBuilder()
-                    {
-                        Description = text,
-                        Color = col,
-                    }.Build());
-                }
+                    await SendMessageFollowUp(cmd, text, col);
             }
             else
-            {
-                await cmd.FollowupAsync(embed: new EmbedBuilder()
-                {
-                    Description = text,
-                    Color = col,
-                }.Build(),
-                components: component);
-            }
+                await SendMessageFollowUp(cmd, text, col, component);
 
             if (type == ResponseMessageType.AddFriendRole && GuestRole != null)
                 LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", result, type, ResponseMessageType.RemoveGuestRole);
@@ -375,12 +381,7 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    await msg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
-                    {
-                        Description = $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!",
-                        Color = Color.Red,
-                    }.Build());
-
+                    await SendMessageModify(msg, $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!", Color.Red);
                     LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
                 }
 
@@ -395,13 +396,7 @@ namespace Janitor.Handler
                     if (await SendMessageToChannel((SocketTextChannel) msg.Channel, text, Color.Orange))
                         await msg.DeleteOriginalResponseAsync();
                     else
-                    {
-                        await msg.ModifyOriginalResponseAsync(msg => msg.Embed = new EmbedBuilder()
-                        {
-                            Description = text,
-                            Color = Color.Orange,
-                        }.Build());                       
-                    }
+                        await SendMessageModify(msg, text, Color.Orange);
 
                     if (GuestRole != null)
                         LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.Success, ResponseMessageType.RemoveFriendRole, ResponseMessageType.AddGuestRole);
