@@ -13,7 +13,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.3";
+        const string BotVersion = "1.0.2.4";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
