@@ -365,4 +365,4 @@ FodyWeavers.xsd
 
 # Ingore Config
 config.json
-/Janitor.Core/config.json
+
