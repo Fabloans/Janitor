@@ -17,7 +17,9 @@ namespace Janitor
         {
             var _builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
+#if DEBUG
                 .AddJsonFile(path: "config.json")
+#endif
                 .AddEnvironmentVariables();
 
             _config = _builder.Build();
