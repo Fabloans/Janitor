@@ -10,7 +10,7 @@ Setting up the Janitor - Discord Bot:
 
 - Copy the generated link. This will be the link so the Bot can be added to your Server.
 
-- Under the Category Bot Create and Copy the Bot Token. The token needs to be pasted in the ./Janitor.Core/config.json document
+- Under the Category Bot Create and Copy the Bot Token. The token needs to be pasted in the "./Janitor.Core/config.json" document.
 Example: "{
 	"Token": "xxx"
 }"
