@@ -39,8 +39,7 @@ namespace Janitor
                 await client.LoginAsync(TokenType.Bot,
                     _config["TestToken"]);
 #else
-                await client.LoginAsync(TokenType.Bot,
-                    _config["Token"]);
+                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BOT_TOKEN"));
 #endif
 
                 await client.StartAsync();
