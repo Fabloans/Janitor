@@ -19,8 +19,8 @@ namespace Janitor.Handler
         const string roleManager = "Role Manager";
         const string addFriendRoleCmd = $"Add \"{roleFriend}\" Role";
         const string removeFriendRoleCmd = $"Remove \"{roleFriend}\" Role";
-        const string announceChannelName = "guest-lounge";
-        const string modChannelName = "mod-log";
+        const string announceChannelName = "guest-lounge"; // Automatic roleGuest assignments go here.
+        const string modChannelName = "mod-log"; // Bot logging channel.
 
         // A simple list of some Janitor related sayings
         List<string> status = new List<string>()
@@ -357,7 +357,7 @@ namespace Janitor.Handler
         private async Task Client_RemoveRoleButtonExecuted(SocketMessageComponent msg)
         {
             await msg.DeferAsync(); // Needed for .Modify[...]() and .Delete[...]() to work.
-            await msg.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().Build()); // Remove Button on click
+            await msg.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().Build()); // Remove Button on click.
 
             var guild = _client.GetGuild((ulong)msg.GuildId);
             var target = guild.GetUser(Convert.ToUInt64(msg.Data.CustomId));
