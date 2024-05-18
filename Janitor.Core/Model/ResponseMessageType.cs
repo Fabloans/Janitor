@@ -1,4 +1,4 @@
-﻿namespace Janitor.Model
+﻿namespace Janitor.Core.Model
 {
     public enum ResponseMessageType
     {

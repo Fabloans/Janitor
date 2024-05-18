@@ -48,7 +48,6 @@ namespace Janitor
                 await Task.Delay(Timeout.Infinite);
                 await _client.StopAsync();
             }
-
         }
 
         private Task LogAsync(LogMessage log)
@@ -77,6 +76,5 @@ namespace Janitor
                 .AddSingleton<HandleEvents>()
                 .BuildServiceProvider();
         }
-
     }
 }
