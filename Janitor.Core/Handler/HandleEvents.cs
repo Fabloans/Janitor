@@ -97,7 +97,7 @@ namespace Janitor.Handler
                 {
                     await user.AddRoleAsync(GuestRole);
                     await SendMessageToChannel(channel, $"Temporary \"{roleGuest}\" role has been granted to {user.Mention}.", Color.Orange);
-                    LogMessage(guild.Id, $"\"{GuestRole}\" role granted to {user.Mention}.", InformationType.Success, ResponseMessageType.AddGuestRole);
+                    LogMessage(guild.Id, $"User joined. \"{GuestRole}\" role granted to {user.Mention}.", InformationType.Success, ResponseMessageType.AddGuestRole);
                 }
                 catch
                 {
