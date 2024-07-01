@@ -71,8 +71,10 @@ namespace Janitor.Handler
             foreach (var guild in guilds)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
+#if DEBUG
                 LogMessage(guild.Id, $"Janitor Bot v{BotVersion} ready.", InformationType.Information, ResponseMessageType.BotReady);
-                
+#endif
+
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
                 await GetOrCreateRole(guild, roleManager);
