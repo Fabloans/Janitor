@@ -12,7 +12,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.5";
+        const string BotVersion = "1.0.2.6";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -91,7 +91,7 @@ namespace Janitor.Handler
             var GuestRole = guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault();
             var channel = guild.Channels.FirstOrDefault(x => x.Name == announceChannelName) as SocketTextChannel;
 
-            if (GuestRole != null)
+            if (GuestRole != null && !user.IsBot)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} joined. Assigning \"{GuestRole}\" to {user.DisplayName}");
 
