@@ -20,7 +20,7 @@ Example: "{
 When adding the bot to your server, it will create the essential roles "Role Manager" and "Friend".
 There are two optional roles "Janitor" and "Guest" which you can create manually.
 
-- The "Role Manager" role has permission to assign or remove the "Friend" role.
+- The "Role Manager" role has permission to assign and remove the "Friend" role.
 - The optional "Janitor" role has permission to only assign the "Friend" role.
 - The optional "Guest" roll will be assigned to users on join, and removed when assigning the "Friend" role (and vice verca). If it exists the automatic role assignment will be announced in the channel "#guest-lounge".
 - The "Janitor", "Friend" and "Guest" roles are mutually exclusive.
