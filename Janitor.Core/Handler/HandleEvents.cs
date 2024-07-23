@@ -103,7 +103,7 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    LogMessage(guild.Id, $": \"{GuestRole}\".", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
+                    LogMessage(guild.Id, $"User joined. Assign \"{GuestRole}\" role to {user.Mention}.", InformationType.ERROR, ResponseMessageType.MissingManageRolesPermission);
                 }
             }
         }
@@ -123,7 +123,7 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    LogMessage(guild.Id, $"Creating missing role: \"{role}\".", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
+                    LogMessage(guild.Id, $"Creating missing role: \"{role}\".", InformationType.ERROR, ResponseMessageType.MissingManageRolesPermission);
                 }
             }
         }
@@ -253,7 +253,7 @@ namespace Janitor.Handler
                         }
                         catch
                         {
-                            await SendInfo(cmd, ResponseMessageType.MissingManagerPermission, target, user);
+                            await SendInfo(cmd, ResponseMessageType.MissingManageRolesPermission, target, user);
                         }
                     }
                 }
@@ -302,7 +302,7 @@ namespace Janitor.Handler
                 case ResponseMessageType.JanitorCantHaveRole:
                     text = $"A {roleJanitor} can't have the \"{roleFriend}\" role! They're cool enough already!";
                     break;
-                case ResponseMessageType.MissingManagerPermission:
+                case ResponseMessageType.MissingManageRolesPermission:
                     text = $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!";
                     result = InformationType.ERROR;
                     break;
@@ -351,9 +351,9 @@ namespace Janitor.Handler
                 await SendMessageFollowUp(cmd, text, col, component);
 
             if (type == ResponseMessageType.AddFriendRole && GuestRole != null)
-                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", result, type, ResponseMessageType.RemoveGuestRole);
+                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}.", result, type, ResponseMessageType.RemoveGuestRole);
             else
-                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}", result, type);
+                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}.", result, type);
         }
 
         private async Task Client_RemoveRoleButtonExecuted(SocketMessageComponent msg)
@@ -380,7 +380,7 @@ namespace Janitor.Handler
                 catch
                 {
                     await SendMessageModify(msg, $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!", Color.Red);
-                    LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.ERROR, ResponseMessageType.MissingManagerPermission);
+                    LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}.", InformationType.ERROR, ResponseMessageType.MissingManageRolesPermission);
                 }
 
                 if (success)
@@ -397,9 +397,9 @@ namespace Janitor.Handler
                         await SendMessageModify(msg, text, Color.Orange);
 
                     if (GuestRole != null)
-                        LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.Success, ResponseMessageType.RemoveFriendRole, ResponseMessageType.AddGuestRole);
+                        LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}.", InformationType.Success, ResponseMessageType.RemoveFriendRole, ResponseMessageType.AddGuestRole);
                     else
-                        LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}", InformationType.Success, ResponseMessageType.RemoveFriendRole);
+                        LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention}.", InformationType.Success, ResponseMessageType.RemoveFriendRole);
                 }
             }
         }

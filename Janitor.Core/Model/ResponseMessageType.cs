@@ -10,7 +10,7 @@
         CreateRole,
         CantEditYourself,
         JanitorCantHaveRole,
-        MissingManagerPermission,
+        MissingManageRolesPermission,
         MissingRoles,
         MissingUserPermission,
         RemoveFriendRole,
