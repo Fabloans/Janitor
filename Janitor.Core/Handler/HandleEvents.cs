@@ -12,7 +12,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.6";
+        const string BotVersion = "1.0.2.7";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -20,7 +20,7 @@ namespace Janitor.Handler
         const string addFriendRoleCmd = $"Add \"{roleFriend}\" Role";
         const string removeFriendRoleCmd = $"Remove \"{roleFriend}\" Role";
         const string announceChannelName = "guest-lounge"; // Automatic roleGuest assignments go here.
-        const string modChannelName = "mod-log"; // Bot logging channel.
+        const string logChannelName = "mod-log"; // Bot logging channel.
 
         // A simple list of some Janitor related sayings
         List<string> status = new List<string>()
@@ -290,7 +290,6 @@ namespace Janitor.Handler
                     result = InformationType.Success;
                     break;
                 case ResponseMessageType.BotCantHaveRole:
-
                     if (target.Id == _client.CurrentUser.Id)
                         text = $"As much as I love you, I can't be your friend. :cry:";
                     else
@@ -406,7 +405,7 @@ namespace Janitor.Handler
 
         private async void LogMessage(ulong server, string message, InformationType result, ResponseMessageType type, ResponseMessageType type2 = ResponseMessageType.Null)
         {
-            var channel = _client.GetGuild(server).Channels.FirstOrDefault(x => x.Name == modChannelName) as SocketTextChannel;
+            var channel = _client.GetGuild(server).Channels.FirstOrDefault(x => x.Name == logChannelName) as SocketTextChannel;
             var col = Color.Red;
 
             Console.WriteLine($"-> {result}: {type}");
