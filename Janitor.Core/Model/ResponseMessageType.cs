@@ -13,6 +13,7 @@
         MissingManageRolesPermission,
         MissingRoles,
         MissingUserPermission,
+        NotAMember,
         RemoveFriendRole,
         RemoveGuestRole,
         UserDoesntHaveFriendRole,

@@ -12,7 +12,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.7";
+        const string BotVersion = "1.0.2.8";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -71,9 +71,9 @@ namespace Janitor.Handler
             foreach (var guild in guilds)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
-#if DEBUG
+//#if DEBUG
                 LogMessage(guild.Id, $"Janitor Bot v{BotVersion} ready.", InformationType.Information, ResponseMessageType.BotReady);
-#endif
+//#endif
 
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
@@ -93,7 +93,7 @@ namespace Janitor.Handler
 
             if (GuestRole != null && !user.IsBot)
             {
-                Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} joined. Assigning \"{GuestRole}\" to {user.DisplayName}");
+                Console.WriteLine($"{DateTime.Now:HH:mm:ss} {guild.Name}: {user.DisplayName} joined. Assigning \"{GuestRole}\" role to {user.DisplayName}");
 
                 try
                 {
@@ -220,14 +220,19 @@ namespace Janitor.Handler
             var JanitorRole = guild.Roles.FirstOrDefault(x => x.Name == roleJanitor && !x.IsManaged);
             var ManagerRole = guild.Roles.FirstOrDefault(x => x.Name == roleManager);
 
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: {user.DisplayName} invoked \"{command}\" for {target.DisplayName}");
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} {guild.Name}: {user.DisplayName} invoked \"{command}\" for {((target != null) ? target.DisplayName : $"\"Invalid member\"")}");
 
-            if (FriendRole == null || (ManagerRole == null && JanitorRole == null))
+            if (target == null)
+            {
+                await SendInfo(cmd, ResponseMessageType.NotAMember, target, user);
+            }
+            else if (FriendRole == null || (ManagerRole == null && JanitorRole == null))
             {
                 await SendInfo(cmd, ResponseMessageType.MissingRoles, target, user);
             }
             else if (user == target)
                 await SendInfo(cmd, ResponseMessageType.CantEditYourself, target, user);
+
             else if (command == addFriendRoleCmd)
             {
                 if (user.Roles.Contains(ManagerRole) || user.Roles.Contains(JanitorRole))
@@ -248,7 +253,7 @@ namespace Janitor.Handler
                                 await target.RemoveRoleAsync(GuestRole);
                                 await SendInfo(cmd, ResponseMessageType.AddFriendRole, target, user, GuestRole);
                             }
-                            else   
+                            else
                                 await SendInfo(cmd, ResponseMessageType.AddFriendRole, target, user);
                         }
                         catch
@@ -313,6 +318,10 @@ namespace Janitor.Handler
                     text = "You are not allowed to do that!";
                     result = InformationType.Alert;
                     break;
+                case ResponseMessageType.NotAMember:
+                    text = "The user is no longer a member of this server!";
+                    result = InformationType.Alert;
+                    break;
                 case ResponseMessageType.RemoveFriendRole:
                     text = $"{target.Mention} will lose all access to private sections!\r\nDo you **REALLY** wish to remove the \"{roleFriend}\" role?";
                     component = new ComponentBuilder().WithButton($"{removeFriendRoleCmd}", $"{target.Id}", ButtonStyle.Danger).Build();
@@ -350,9 +359,9 @@ namespace Janitor.Handler
                 await SendMessageFollowUp(cmd, text, col, component);
 
             if (type == ResponseMessageType.AddFriendRole && GuestRole != null)
-                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}.", result, type, ResponseMessageType.RemoveGuestRole);
+                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {((target != null) ? target.Mention : $"\"Invalid member\"")}.", result, type, ResponseMessageType.RemoveGuestRole);
             else
-                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {target.Mention}.", result, type);
+                LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{cmd.CommandName}\" for {((target != null) ? target.Mention : $"\"Invalid member\"")}.", result, type);
         }
 
         private async Task Client_RemoveRoleButtonExecuted(SocketMessageComponent msg)
