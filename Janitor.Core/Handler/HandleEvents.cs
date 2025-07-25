@@ -12,7 +12,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.8";
+        const string BotVersion = "1.0.2.9";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -89,8 +89,9 @@ namespace Janitor.Handler
         {
             var guild = _client.GetGuild(user.Guild.Id);
             var GuestRole = guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault();
+            var JanitorRole = guild.Roles.Where(x => x.Name == roleJanitor).FirstOrDefault();
             var channel = guild.Channels.FirstOrDefault(x => x.Name == announceChannelName) as SocketTextChannel;
-
+  
             if (GuestRole != null && !user.IsBot)
             {
                 Console.WriteLine($"{DateTime.Now:HH:mm:ss} {guild.Name}: {user.DisplayName} joined. Assigning \"{GuestRole}\" role to {user.DisplayName}");
@@ -98,7 +99,11 @@ namespace Janitor.Handler
                 try
                 {
                     await user.AddRoleAsync(GuestRole);
-                    await SendMessageToChannel(channel, $"Temporary \"{roleGuest}\" role has been granted to {user.Mention}.", Color.Orange);
+
+                    var msg = $"Temporary \"{roleGuest}\" role has been granted to {user.Mention}.";
+                    if (JanitorRole != null)
+                        msg += $"\n-# *({JanitorRole.Mention}'s and higher can right click on the username above and select **\"Apps -> Add Friend Role\"** to grant server access)*";
+                    await SendMessageToChannel(channel, msg, Color.Orange);
                     LogMessage(guild.Id, $"User joined. \"{GuestRole}\" role granted to {user.Mention}.", InformationType.Success, ResponseMessageType.AddGuestRole);
                 }
                 catch
