@@ -1,6 +1,6 @@
 Setting up the Janitor - Discord Bot:
 
-- Got to the Discord develpoer Portal. (https://discord.com/developers)
+- Got to the Discord developer Portal. (https://discord.com/developers)
 - Sign in with your Account.
 - Create a New Application.
 - Under OAuth2 Check the Bot.
