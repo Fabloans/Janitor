@@ -1,21 +1,21 @@
 Setting up the Janitor - Discord Bot:
 
-- Got to the Discord developer Portal. (https://discord.com/developers)
-- Sign in with your Account.
-- Create a New Application.
-- Under OAuth2 Check the Bot.
+- Got to the Discord developer portal: https://discord.com/developers
+- Sign in with your account.
+- Create a new application.
+- Under OAuth2, check the bot:
 ![image](https://github.com/Fabloans/Janitor/assets/93011108/0c6414dd-92a9-4cca-8543-dc8d5dfda365)
-- After that a window should appear. Check the following Permissions
+- After that a window should appear. Check the following permissions:
 ![image](https://github.com/Fabloans/Janitor/assets/28175673/be634b00-f3dc-4c97-89c1-852b16d829be)
 
-- Copy the generated link. This will be the link so the Bot can be added to your Server.
+- Copy the generated link. This will be the link so the bot can be added to your server.
 
-- Under the Category Bot Create and Copy the Bot Token. The token needs to be pasted in the "./Janitor.Core/config.json" document.
+- Under the category "Bot" create and copy the bot token. The token needs to be pasted in the "./Janitor.Core/config.json" document.
 Example: "{
 	"Token": "xxx"
 }"
 
-- After that you can run the Bot. Have fun.
+- After that you can run the bot. Have fun.
 
 When adding the bot to your server, it will create the essential roles "Role Manager" and "Friend".
 There are two optional roles "Janitor" and "Guest" which you can create manually.
