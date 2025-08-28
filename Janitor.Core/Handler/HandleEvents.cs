@@ -12,7 +12,7 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.11";
+        const string BotVersion = "1.0.2.12";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
@@ -88,8 +88,8 @@ namespace Janitor.Handler
         private async Task Client_UserJoined(SocketGuildUser user)
         {
             var guild = _client.GetGuild(user.Guild.Id);
-            var GuestRole = guild.Roles.Where(x => x.Name == roleGuest).FirstOrDefault();
-            var JanitorRole = guild.Roles.Where(x => x.Name == roleJanitor).FirstOrDefault();
+            var GuestRole = guild.Roles.FirstOrDefault(x => x.Name == roleGuest);
+            var JanitorRole = guild.Roles.FirstOrDefault(x => x.Name == roleJanitor);
             var channel = guild.Channels.FirstOrDefault(x => x.Name == announceChannelName) as SocketTextChannel;
   
             if (GuestRole != null && !user.IsBot)
