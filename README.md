@@ -27,4 +27,4 @@ There are two optional roles "Janitor" and "Guest" which you can create manually
 - Activity logs will be posted in the channel "#mod-log".
 - The "Janitor", "Friend" and "Guest" roles are mutually exclusive.
 
-In case you don't want the role assignment/revokation messages to be public, simply remove the bot's "Send messages" role.
+In case you don't want the role assignment/revokation messages to be public, simply remove the bot's "Send messages" permission.
