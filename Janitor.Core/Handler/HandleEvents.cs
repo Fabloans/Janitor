@@ -100,9 +100,9 @@ namespace Janitor.Handler
                 {
                     await user.AddRoleAsync(GuestRole);
 
-                    var msg = $"Temporary \"{roleGuest}\" role has been granted to {user.Mention}.";
+                    var msg = $"Welcome {user.Mention}. Temporary \"{roleGuest}\" role has been granted.";
                     if (JanitorRole != null)
-                        msg += $"\n-# *({JanitorRole.Mention}'s and higher can right click on the username above and select **\"Apps -> Add Friend Role\"** to grant server access)*";
+                        msg += $"\n-# *({JanitorRole.Mention}'s and higher can right click on the username above and select **“Apps → Add \"Friend\" Role”** to grant full server access)*";
                     await SendMessageToChannel(channel, msg, Color.Orange);
 
                     LogMessage(guild.Id, $"User joined. \"{GuestRole}\" role granted to {user.Mention} (\"{user.Username}\").", InformationType.Success, ResponseMessageType.AddGuestRole);
@@ -297,7 +297,7 @@ namespace Janitor.Handler
                 case ResponseMessageType.AddFriendRole:
                     text = $"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.";
                     if (GuestRole != null)
-                        text += $"\r\n\"{roleGuest}\" role has been removed.";
+                        text += $"\n\"{roleGuest}\" role has been removed.";
                     result = InformationType.Success;
                     break;
                 case ResponseMessageType.BotCantHaveRole:
@@ -329,7 +329,7 @@ namespace Janitor.Handler
                     result = InformationType.Alert;
                     break;
                 case ResponseMessageType.RemoveFriendRole:
-                    text = $"{target.Mention} will lose all access to private sections!\r\nDo you **REALLY** wish to remove the \"{roleFriend}\" role?";
+                    text = $"{target.Mention} will lose all access to private sections!\nDo you **REALLY** wish to remove the \"{roleFriend}\" role?";
                     component = new ComponentBuilder().WithButton($"{removeFriendRoleCmd}", $"{target.Id}", ButtonStyle.Danger).Build();
                     result = InformationType.Alert;
                     break;
@@ -402,7 +402,7 @@ namespace Janitor.Handler
                     string text = $"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.";
 
                     if (GuestRole != null)
-                        text += $"\r\n\"{roleGuest}\" role has been granted.";
+                        text += $"\n\"{roleGuest}\" role has been granted.";
 
                     // Try to send as message, fallback to ephemeral response in case of missing permissions.
                     if (await SendMessageToChannel((SocketTextChannel)msg.Channel, text, Color.Orange))
@@ -440,9 +440,9 @@ namespace Janitor.Handler
                     break;
             }
 
-            string text = $"{message}\r\n-> {result}: {type}";
+            string text = $"{message}\n-> {result}: {type}";
             if (type2 != ResponseMessageType.Null)
-                text += $"\r\n -> {result}: {type2}";
+                text += $"\n -> {result}: {type2}";
 
             await SendMessageToChannel(channel, text, col);
         }
