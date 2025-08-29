@@ -17,7 +17,9 @@ namespace Janitor
         {
             var _builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile(path: "config.json")
+#if DEBUG
+                //.AddJsonFile(path: "config.json")
+#endif
                 .AddEnvironmentVariables();
 
             _config = _builder.Build();
@@ -39,8 +41,7 @@ namespace Janitor
                 await client.LoginAsync(TokenType.Bot,
                     _config["TestToken"]);
 #else
-                await client.LoginAsync(TokenType.Bot,
-                    _config["Token"]);
+                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("Token"));
 #endif
 
                 await client.StartAsync();
