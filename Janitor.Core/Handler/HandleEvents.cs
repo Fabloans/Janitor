@@ -226,7 +226,7 @@ namespace Janitor.Handler
             var JanitorRole = guild.Roles.FirstOrDefault(x => x.Name == roleJanitor && !x.IsManaged);
             var ManagerRole = guild.Roles.FirstOrDefault(x => x.Name == roleManager);
 
-            Console.WriteLine($"{DateTime.Now:HH:mm:ss} {guild.Name}: {user.DisplayName} (\"{user.Username}\") invoked \"{command}\" for {((target != null) ? target.DisplayName : $"\"Invalid member\"")} (\"{target.Username}\").");
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} {guild.Name}: {user.DisplayName} (\"{user.Username}\") invoked \"{command}\" for {((target != null) ? (target.DisplayName + $" (\"{target.Username}\")") : $"[Invalid member]")}.");
 
             if (target == null)
             {
@@ -365,9 +365,9 @@ namespace Janitor.Handler
                 await SendMessageFollowUp(cmd, text, col, component);
 
             if (type == ResponseMessageType.AddFriendRole && GuestRole != null)
-                LogMessage(user.Guild.Id, $"{user.Mention} (\"{user.Username}\") invoked \"{cmd.CommandName}\" for {((target != null) ? target.Mention : $"\"Invalid member\"")} (\"{target.Username}\").", result, type, ResponseMessageType.RemoveGuestRole);
+                LogMessage(user.Guild.Id, $"{user.Mention} (\"{user.Username}\") invoked \"{cmd.CommandName}\" for {((target != null) ? (target.Mention + $" (\"{target.Username}\")") : $"[Invalid member]")}.", result, type, ResponseMessageType.RemoveGuestRole);
             else
-                LogMessage(user.Guild.Id, $"{user.Mention} (\"{user.Username}\") invoked \"{cmd.CommandName}\" for {((target != null) ? target.Mention : $"\"Invalid member\"")} (\"{target.Username}\").", result, type);
+                LogMessage(user.Guild.Id, $"{user.Mention} (\"{user.Username}\") invoked \"{cmd.CommandName}\" for {((target != null) ? (target.Mention + $" (\"{target.Username}\")") : $"[Invalid member]")}.", result, type);
         }
 
         private async Task Client_RemoveRoleButtonExecuted(SocketMessageComponent msg)
