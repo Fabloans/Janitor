@@ -12,13 +12,13 @@ namespace Janitor.Handler
     {
         DiscordSocketClient _client;
 
-        const string BotVersion = "1.0.2.13";
+        const string BotVersion = "1.0.2.14";
         const string roleFriend = "Friend";
         const string roleGuest = "Guest";
         const string roleJanitor = "Janitor";
         const string roleManager = "Role Manager";
-        const string addFriendRoleCmd = $"Add \"{roleFriend}\" Role";
-        const string removeFriendRoleCmd = $"Remove \"{roleFriend}\" Role";
+        const string addFriendRoleCmd = $"Add “{roleFriend}” Role";
+        const string removeFriendRoleCmd = $"Remove “{roleFriend}” Role";
         const string announceChannelName = "guest-lounge"; // Automatic roleGuest assignments go here.
         const string logChannelName = "mod-log"; // Bot logging channel.
 
@@ -100,12 +100,12 @@ namespace Janitor.Handler
                 {
                     await user.AddRoleAsync(GuestRole);
 
-                    var msg = $"Welcome {user.Mention}. Temporary \"{roleGuest}\" role has been granted.";
+                    var msg = $"Welcome {user.Mention}. Temporary “{roleGuest}” role has been granted.";
                     if (JanitorRole != null)
-                        msg += $"\n-# *({JanitorRole.Mention}'s and higher can right click on the username above and select **“Apps → Add \"Friend\" Role”** to grant full server access)*";
+                        msg += $"\n-# *({JanitorRole.Mention}’s and higher can right click on the username above and select **“Apps → {addFriendRoleCmd}”** to grant full server access)*";
                     await SendMessageToChannel(channel, msg, Color.Orange);
 
-                    LogMessage(guild.Id, $"User joined. \"{GuestRole}\" role granted to {user.Mention} (\"{user.Username}\").", InformationType.Success, ResponseMessageType.AddGuestRole);
+                    LogMessage(guild.Id, $"User joined. Assign \"{GuestRole}\" role to {user.Mention} (\"{user.Username}\").", InformationType.Success, ResponseMessageType.AddGuestRole);
                 }
                 catch
                 {
@@ -295,29 +295,29 @@ namespace Janitor.Handler
             switch (type)
             {
                 case ResponseMessageType.AddFriendRole:
-                    text = $"\"{roleFriend}\" role has been granted to {target.Mention} by {user.Mention}.";
+                    text = $"“{roleFriend}” role has been granted to {target.Mention} by {user.Mention}.";
                     if (GuestRole != null)
-                        text += $"\n\"{roleGuest}\" role has been removed.";
+                        text += $"\n“{roleGuest}” role has been removed.";
                     result = InformationType.Success;
                     break;
                 case ResponseMessageType.BotCantHaveRole:
                     if (target.Id == _client.CurrentUser.Id)
                         text = $"As much as I love you, I can't be your friend. :cry:";
                     else
-                        text = $"A bot can't have the \"{roleFriend}\" role!";
+                        text = $"A bot can't have the “{roleFriend}” role!";
                     break;
                 case ResponseMessageType.CantEditYourself:
                     text = $"You seem to have emotional problems. Try to join voice, they might be able to help you. :melting_face:";
                     break;
                 case ResponseMessageType.JanitorCantHaveRole:
-                    text = $"A {roleJanitor} can't have the \"{roleFriend}\" role! They're cool enough already!";
+                    text = $"A {roleJanitor} can't have the “{roleFriend}” role! They're cool enough already!";
                     break;
                 case ResponseMessageType.MissingManageRolesPermission:
-                    text = $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!";
+                    text = $"ERROR: Janitor Bot is missing “Manage Roles” permission!";
                     result = InformationType.ERROR;
                     break;
                 case ResponseMessageType.MissingRoles:
-                    text = $"ERROR: The \"{roleFriend}\" or either the \"{roleManager}\" or \"{roleJanitor}\" role is missing!";
+                    text = $"ERROR: The “{roleFriend}” or either the “{roleManager}” or “{roleJanitor}” role is missing!";
                     result = InformationType.ERROR;
                     break;
                 case ResponseMessageType.MissingUserPermission:
@@ -325,19 +325,19 @@ namespace Janitor.Handler
                     result = InformationType.Alert;
                     break;
                 case ResponseMessageType.NotAMember:
-                    text = "The user is no longer a member of this server!";
+                    text = "This user is no longer a member of this server!";
                     result = InformationType.Alert;
                     break;
                 case ResponseMessageType.RemoveFriendRole:
-                    text = $"{target.Mention} will lose all access to private sections!\nDo you **REALLY** wish to remove the \"{roleFriend}\" role?";
+                    text = $"{target.Mention} will lose all access to private sections!\nDo you **REALLY** wish to remove the “{roleFriend}” role?";
                     component = new ComponentBuilder().WithButton($"{removeFriendRoleCmd}", $"{target.Id}", ButtonStyle.Danger).Build();
                     result = InformationType.Alert;
                     break;
                 case ResponseMessageType.UserDoesntHaveFriendRole:
-                    text = $"{target.Mention} doesn't have the \"{roleFriend}\" role!";
+                    text = $"{target.Mention} doesn't have the “{roleFriend}” role!";
                     break;
                 case ResponseMessageType.UserHasFriendRoleAlready:
-                    text = $"{target.Mention} already has the \"{roleFriend}\" role!";
+                    text = $"{target.Mention} already has the “{roleFriend}” role!";
                     break;
             }
 
@@ -393,16 +393,16 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    await SendMessageModify(msg, $"ERROR: Janitor Bot is missing \"Manage Roles\" permission!", Color.Red);
+                    await SendMessageModify(msg, $"ERROR: Janitor Bot is missing “Manage Roles” permission!", Color.Red);
                     LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention} (\"{target.Username}\").", InformationType.ERROR, ResponseMessageType.MissingManageRolesPermission);
                 }
 
                 if (success)
                 {
-                    string text = $"\"{roleFriend}\" role has been removed from {target.Mention} by {user.Mention}.";
+                    string text = $"“{roleFriend}” role has been removed from {target.Mention} by {user.Mention}.";
 
                     if (GuestRole != null)
-                        text += $"\n\"{roleGuest}\" role has been granted.";
+                        text += $"\n“{roleGuest}” role has been granted.";
 
                     // Try to send as message, fallback to ephemeral response in case of missing permissions.
                     if (await SendMessageToChannel((SocketTextChannel)msg.Channel, text, Color.Orange))
@@ -442,7 +442,7 @@ namespace Janitor.Handler
 
             string text = $"{message}\n-> {result}: {type}";
             if (type2 != ResponseMessageType.Null)
-                text += $"\n -> {result}: {type2}";
+                text += $"\n-> {result}: {type2}";
 
             await SendMessageToChannel(channel, text, col);
         }
