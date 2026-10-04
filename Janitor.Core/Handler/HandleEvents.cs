@@ -31,7 +31,7 @@ namespace Janitor.Handler
             "Powered by beer.", // ;)
             "No one pays attention to the Janitor.",
             "Everything will be fine, the Janitor is here.",
-            "↑ This is what a really cool Janitor looks like.",
+            "← This is what a really cool Janitor looks like.",
             "What?", // Insider. ;)
             "Why are you looking at me like that?",
             "Sometimes I think I'm Batman.",
@@ -197,7 +197,7 @@ namespace Janitor.Handler
             }.Build());
         }
 
-        private async void SetStatus()
+        private void SetStatus()
         {
             var StatusThread = new Thread(x =>
             {
@@ -380,6 +380,13 @@ namespace Janitor.Handler
             var user = guild.GetUser(msg.User.Id);
             var FriendRole = guild.Roles.FirstOrDefault(x => x.Name == roleFriend);
             var GuestRole = guild.Roles.FirstOrDefault(x => x.Name == roleGuest);
+            var ManagerRole = guild.Roles.FirstOrDefault(x => x.Name == roleManager);
+
+            if (!user.Roles.Contains(ManagerRole))
+            {
+                await SendMessageModify(msg, $"ERROR: You are not allowed to do that!", Color.Orange);
+                return;
+            }
 
             if (target.Roles.Contains(FriendRole))
             {
@@ -393,7 +400,7 @@ namespace Janitor.Handler
                 }
                 catch
                 {
-                    await SendMessageModify(msg, $"ERROR: Janitor Bot is missing “Manage Roles” permission!", Color.Red);
+                    await SendMessageModify(msg, $"ERROR: Janitor Bot is missing “Manage Roles” permission!", Color.Orange);
                     LogMessage(user.Guild.Id, $"{user.Mention} invoked \"{removeFriendRoleCmd}\" for {target.Mention} (\"{target.Username}\").", InformationType.ERROR, ResponseMessageType.MissingManageRolesPermission);
                 }
 
