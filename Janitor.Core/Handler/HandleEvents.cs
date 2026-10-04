@@ -4,6 +4,8 @@ using Discord.Net;
 using Discord.WebSocket;
 using Janitor.Core.Model;
 using Newtonsoft.Json;
+using System;
+using System.ComponentModel.Design;
 using System.Data;
 
 namespace Janitor.Handler
@@ -21,6 +23,7 @@ namespace Janitor.Handler
         const string removeFriendRoleCmd = $"Remove “{roleFriend}” Role";
         const string announceChannelName = "guest-lounge"; // Automatic roleGuest assignments go here.
         const string logChannelName = "mod-log"; // Bot logging channel.
+        bool ClientReady = false;
 
         // A simple list of some Janitor related sayings
         List<string> status = new List<string>()
@@ -68,21 +71,25 @@ namespace Janitor.Handler
         {
             var guilds = _client.Guilds;
 
+            if (ClientReady)
+                return;
+
             foreach (var guild in guilds)
             {
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
-#if DEBUG
+//#if DEBUG
                 LogMessage(guild.Id, $"Janitor Bot v{BotVersion} ready.", InformationType.Information, ResponseMessageType.BotReady);
-#endif
+                //#endif
 
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
                 await GetOrCreateRole(guild, roleManager);
-
                 AddUserCommand(guild);
             }
 
             SetStatus();
+
+            ClientReady = true;
         }
 
         private async Task Client_UserJoined(SocketGuildUser user)
@@ -290,6 +297,8 @@ namespace Janitor.Handler
             var text = string.Empty;
             var col = Color.Red;
             var result = InformationType.Information;
+            var guild = _client.GetGuild(user.Guild.Id);
+            var announceChannel = guild.Channels.FirstOrDefault(x => x.Name == announceChannelName) as SocketTextChannel;
             MessageComponent component = null;
 
             switch (type)
@@ -317,7 +326,7 @@ namespace Janitor.Handler
                     result = InformationType.ERROR;
                     break;
                 case ResponseMessageType.MissingRoles:
-                    text = $"ERROR: The “{roleFriend}” or either the “{roleManager}” or “{roleJanitor}” role is missing!";
+                    text = $"ERROR: The “{roleFriend}”, “{roleManager}” or “{roleJanitor}” role is missing!";
                     result = InformationType.ERROR;
                     break;
                 case ResponseMessageType.MissingUserPermission:
@@ -356,8 +365,13 @@ namespace Janitor.Handler
 
             if (type == ResponseMessageType.AddFriendRole) {
                 // Try to send as message, fallback to ephemeral response in case of missing permissions.
-                if (await SendMessageToChannel((SocketTextChannel)cmd.Channel, text, col))
-                    await cmd.DeleteOriginalResponseAsync();
+                if (await SendMessageToChannel(announceChannel, text, col))
+                {
+                    if (announceChannel != cmd.Channel)
+                        await SendMessageFollowUp(cmd, text, col);
+                    else
+                        await cmd.DeleteOriginalResponseAsync();                                
+                }
                 else
                     await SendMessageFollowUp(cmd, text, col);
             }
@@ -381,6 +395,8 @@ namespace Janitor.Handler
             var FriendRole = guild.Roles.FirstOrDefault(x => x.Name == roleFriend);
             var GuestRole = guild.Roles.FirstOrDefault(x => x.Name == roleGuest);
             var ManagerRole = guild.Roles.FirstOrDefault(x => x.Name == roleManager);
+            var announceChannel = guild.Channels.FirstOrDefault(x => x.Name == announceChannelName) as SocketTextChannel;
+
 
             if (!user.Roles.Contains(ManagerRole))
             {
@@ -412,8 +428,13 @@ namespace Janitor.Handler
                         text += $"\n“{roleGuest}” role has been granted.";
 
                     // Try to send as message, fallback to ephemeral response in case of missing permissions.
-                    if (await SendMessageToChannel((SocketTextChannel)msg.Channel, text, Color.Orange))
-                        await msg.DeleteOriginalResponseAsync();
+                    if (await SendMessageToChannel(announceChannel, text, Color.Orange))
+                    {                  
+                        if (announceChannel != msg.Channel)
+                            await SendMessageModify(msg, text, Color.Orange);
+                        else
+                            await msg.DeleteOriginalResponseAsync();
+                    }
                     else
                         await SendMessageModify(msg, text, Color.Orange);
 
