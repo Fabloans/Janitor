@@ -63,8 +63,7 @@ namespace Janitor.Handler
             // Create essential roles when joining guild.
             await GetOrCreateRole(guild, roleFriend);
             await GetOrCreateRole(guild, roleManager);
-
-            AddUserCommand(guild);
+            await AddUserCommand(guild);
         }
 
         private async Task Client_Ready()
@@ -79,12 +78,12 @@ namespace Janitor.Handler
                 Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} {guild.Name}: Janitor Bot v{BotVersion} ready.");
 //#if DEBUG
                 LogMessage(guild.Id, $"Janitor Bot v{BotVersion} ready.", InformationType.Information, ResponseMessageType.BotReady);
-                //#endif
+//#endif
 
                 // Create essential roles when client is ready.
                 await GetOrCreateRole(guild, roleFriend);
                 await GetOrCreateRole(guild, roleManager);
-                AddUserCommand(guild);
+                await AddUserCommand(guild);
             }
 
             SetStatus();
@@ -141,7 +140,7 @@ namespace Janitor.Handler
             }
         }
 
-        private async void AddUserCommand(SocketGuild guild)
+        private async Task AddUserCommand(SocketGuild guild)
         {
             var guildUserCommandAddRole = new UserCommandBuilder();
             var guildUserCommandRemoveRole = new UserCommandBuilder();
